@@ -1,12 +1,12 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageColor
 import random
 import csv
 import vars
 
 tar_shapes = [
-"circle","semicircle","quarter circle",
 "triangle","square","pentagon","hexagon","heptagon","octagon",
-"rectangle","trapezoid","star","cross"
+"circle",
+"semicircle","quartercircle","rectangle","star","trap","cross"
 ]
 
 tar_colors=[
@@ -22,22 +22,52 @@ tar_colors=[
     [72, 59, 39],  #Brown
 ]
 
-# def gen_targets(amounts):
+tar_colors_names=[
+    "White"
+    , "Black"
+    , "Gray"
+    , "Red"
+    , "Green"
+    , "Blue"
+    , "Yellow"
+    , "Purple"
+    , "Orange"
+    , "Brown"
+]
+def gen_targets(amount):
+    for x in range(amount):
+        rand_color = random.sample(range(9), k=2)
+        seed = [random.randint(0,12),rand_color[0],chr(random.randint(65,90)), 90*random.randint(0,3), rand_color[1]]
+        # seed = [6, 4, chr(65), 0]
+        #first is selecting a random shape from tar_shape, second is random from colors, thrid is the letter, 4 is rotation
+        print("seed: {} {} {} {} {}".format(seed[0],seed[1], seed[2], seed[3], seed[4]))
 
-# seed = [random.randint(0,12),random.randint(0,9),random.randint(65,90)]
-seed = [0, 1, chr(65)]
-#first is selecting a random shape from tar_shape, second is random from colors, thrid is the letter
-print("seed: {} {} {}".format(seed[0],seed[1], seed[2]))
+        img = Image.new(mode="RGB", size=vars.tar_res, color="white")
+        img_draw = ImageDraw.Draw(img)
+        img_font = ImageFont.truetype("arial.ttf", 12)
+        img_fp = ("./target_images/"+"{},{},{},{},{}".format(tar_shapes[seed[0]], tar_colors_names[seed[1]], seed[2], seed[3],tar_colors_names[seed[4]]))+".png"
+        # print(tar_colors[seed[1]])
+        # print(ImageColor.getcolor([0,0,255],"RGBA"))
 
-img = Image.new(mode="RGB", size=vars.tar_res, color="white")
-img_draw = ImageDraw.Draw(img)
-img_font = ImageFont.truetype("arial.ttf", 12)
-img_fp = ("./target_images/"+"{},{},{}".format(seed[0],seed[1], seed[2]))+".png"
+        if(seed[0] == 6):
+            img_draw.ellipse([0,0,img.size], fill=tar_colors_names[seed[1]], width=0)
+        if(seed[0] > 6):
+            special_cases = ["semicircle.bmp",
+            "quartercircle.bmp",
+            "rect.bmp",
+            "star.bmp",
+            "trap.bmp",
+            "cross.bmp"
+            ]
+            bit_file = Image.open(special_cases[seed[0]-7])
+            img_draw.bitmap([0,0],bit_file, fill=tar_colors_names[seed[1]])
+        if(seed[0] <= 5):
+            img_draw.regular_polygon([img.size[0]/2,img.size[1]/2,img.size[0]/2], seed[0]+3, fill=tar_colors_names[seed[1]])
 
-if(seed[0] == 0):
-    img_draw.ellipse([0,0,vars.tar_res[0]-1,vars.tar_res[1]-1], fill=seed[1], width=1)
-    img_draw.text([vars.tar_res[0]/2,vars.tar_res[1]/2],seed[2], fill=None , anchor="mm", font=img_font)
-    # img.show()
-
-img.save(img_fp,format="PNG")
-
+        im = img.rotate(seed[3])
+        im_draw = ImageDraw.Draw(im)
+        # print("pog")
+        im_draw.text([vars.tar_res[0]/2,vars.tar_res[1]/2],seed[2], fill=tar_colors_names[4] , anchor="mm", font=img_font)
+        # im.show()
+        im.save(img_fp,format="PNG")
+    return
