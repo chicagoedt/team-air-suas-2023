@@ -6,20 +6,29 @@
 
 Branch from main to contribute. Branch names should have an appropriate prefix (usually test/, feat/ or fix/) and under 4 words and 20 characters. They should be all lowercase with dashes '-' in between words.
 
-- test/branch-name
-- feat/branch-name
-- fix/branch-name
+For example:
+
+- `test/branch-name`
+- `feat/branch-name`
+- `fix/branch-name`
 
 ### Commits
 
-Commits in the branch can be whatever you want, but when you merge to main, you should squash your commits to just the prefix and a short description (the branch name works). Add more detail on what you did in the body of the commit.
+Commits in the branch can be whatever you want, but when you merge to main, you should squash your commits to just the prefix and a short description (like the branch name).
 
 For example:
 
-branch: `feat/add-new-objects`
-commit: `feat: add new objects`
+`git branch feat/add-new-objects`
 
-If there was extra detail I needed to add to the commit, the whole commit would look like this:
+`git commit -m "feat: add new objects"`
+
+If you have changed a lot in one commit that you want to detail, you can just type `git commit` and git will open up a file for you to edit. The first line of the file should be the short commit message with the prefix. The second line should be blank. And the remaining lines can be whatever you need to explain what you changed.
+
+For example:
+
+`git commit`
+
+...
 
 ```
 feat: add objects to winch
