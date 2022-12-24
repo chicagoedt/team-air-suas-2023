@@ -42,7 +42,7 @@ def gen_targets(amount):
         #first is selecting a random shape from tar_shape, second is random from colors, thrid is the letter, 4 is rotation
         print("seed: {} {} {} {} {}".format(seed[0],seed[1], seed[2], seed[3], seed[4]))
 
-        img = Image.new(mode="RGB", size=vars.tar_res, color="white")
+        img = Image.new(mode="RGBA", size=vars.tar_res, color="white")
         img_draw = ImageDraw.Draw(img)
         img_font = ImageFont.truetype("arial.ttf", 12)
         img_fp = ("./target_images/"+"{},{},{},{},{}".format(tar_shapes[seed[0]], tar_colors_names[seed[1]], seed[2], seed[3],tar_colors_names[seed[4]]))+".png"
@@ -67,7 +67,7 @@ def gen_targets(amount):
         im = img.rotate(seed[3])
         im_draw = ImageDraw.Draw(im)
         # print("pog")
-        im_draw.text([vars.tar_res[0]/2,vars.tar_res[1]/2],seed[2], fill=tar_colors_names[4] , anchor="mm", font=img_font)
+        im_draw.text([vars.tar_res[0]/2,vars.tar_res[1]/2],seed[2], fill=tar_colors_names[seed[4]] , anchor="mm", font=img_font)
         # im.show()
         im.save(img_fp,format="PNG")
     return
