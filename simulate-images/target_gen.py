@@ -3,6 +3,8 @@ import random
 import csv
 import vars
 
+special_case_dir = "special_imgs/"
+
 tar_shapes = [
 "triangle","square","pentagon","hexagon","heptagon","octagon",
 "circle",
@@ -59,12 +61,12 @@ def gen_targets(amount):
             "trap.bmp",
             "cross.bmp"
             ]
-            bit_file = Image.open(special_cases[seed[0]-7])
+            bit_file = Image.open(special_case_dir+(special_cases[seed[0]-7]))
             img_draw.bitmap([0,0],bit_file, fill=tar_colors_names[seed[1]])
         if(seed[0] <= 5):
             img_draw.regular_polygon([img.size[0]/2,img.size[1]/2,img.size[0]/2], seed[0]+3, fill=tar_colors_names[seed[1]])
 
-        im = img.rotate(seed[3])
+        im = img.rotate(seed[3], fillcolor=(0,0,0,0))
         im_draw = ImageDraw.Draw(im)
         # print("pog")
         im_draw.text([vars.tar_res[0]/2,vars.tar_res[1]/2],seed[2], fill=tar_colors_names[seed[4]] , anchor="mm", font=img_font)
