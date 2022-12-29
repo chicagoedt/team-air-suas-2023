@@ -8,3 +8,4 @@ __pycache__/
 /simulate-images/master_images/
 
 
+*.xcf
