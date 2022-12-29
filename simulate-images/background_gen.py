@@ -6,57 +6,66 @@ from shapely.geometry import Polygon, MultiPoint, Point
 import os
 
 
-seed = [random.randint(0,359), random.randint(1,5)]
+final_dir = "final_images/"
+master_dir = "master_images/"
+polygon = Polygon(([2932,2688],[2864,3500],[6800,3600],[6850,2800]))
+def polygon_random_points (poly):
+    min_x, min_y, max_x, max_y = poly.bounds
+    points = []
+    while len(points) < 1:
+        random_point = Point([random.uniform(min_x, max_x), random.uniform(min_y, max_y)])
+        if (random_point.within(poly)):
+            points.append(random_point)
+    return points[0]
+def generate_final(amount):
+    for _ in range(amount):
+        tl_point = polygon_random_points(polygon)
 
-tar_files = os.listdir("target_images")
+        print(tl_point)
 
-tar_path = random.choice(tar_files)
+        point = (int(tl_point.x),int(tl_point.y))
 
-tar_img = Image.open("target_images/"+tar_path)
+        seed = [random.randint(0,359), point[0], point[1]]
 
-mask_img = Image.open("master_mask.bmp")
+        tar_files = os.listdir("target_images")
 
-bgd_img = Image.open("master_background.png")
+        tar_path = random.choice(tar_files)
 
-rot_img = tar_img.rotate(seed[0],expand=True, fillcolor=(0,0,0,0))
-angle = seed[0]
+        print(tar_path)
 
-arr = np.asarray(rot_img)
-print(arr.shape)
+        tar_img = Image.open("target_images/"+tar_path)
+        tar_img = tar_img.convert("RGBA")
+        bgd_img = Image.open("master_background.png",mode="r")
+        bgd_img = bgd_img.convert("RGBA")
+        # print(bgd_img.mode)
 
-# Find the non-zero elements of the array (i.e., the pixels of the image)
-y, x,_ = np.nonzero(arr)
+        rot_img = tar_img.rotate(seed[0],expand=True, fillcolor="#00000000")
+        # rot_img.show()
+        # print(rot_img.mode)
+        angle = seed[0]
+        bgd_img.alpha_composite(rot_img,dest=point)
 
-print(y.shape)
+        # bgd_img.crop()
 
-# Stack the x and y coordinates into a single array
-points = np.column_stack((x, y))
+        # bgd_img.show()
 
-# Calculate the minimum rotated bounding box around the points
-# rect = cv2.minAreaRect()
+        bgd_img.convert("RGB").save(master_dir + "master{}__{}__{}".format(seed[0],seed[1],seed[2])+".jpg")
+        tlx_crop = random.randint(0,2864)
+        tly_crop = random.randint(0,2688)
+        while not(tlx_crop < seed[1] < tlx_crop+4032 and tlx_crop < seed[1]+rot_img.width < tlx_crop+4032):
+            tlx_crop = random.randint(0, 2864)
+            print("retry")
+        while not(tly_crop < seed[2] < tly_crop+3040 and tly_crop < seed[2]+rot_img.height < tly_crop+3040):
+            print("retry")
+            tly_crop = random.randint(0, 2688)
+        print(str(tlx_crop)+" "+str(tly_crop)+" "+str(tlx_crop+4032)+" "+str(tly_crop+3040))
+        print(bgd_img.size)
+        brx_crop = tlx_crop+4032
+        bry_crop = tly_crop+3040
+        fnl_img = bgd_img.crop((tlx_crop,tly_crop,brx_crop,bry_crop))
+        fnl_img.convert("RGB").save(final_dir+"{}_{}_{}_{}.jpg".format(seed[0],seed[1]-tlx_crop,seed[2]-tly_crop,tar_path))
+    return
 
-# Convert the image to grayscale and detect the edges
-# gray = cv2.cvtColor(arr, cv2.COLOR_BGR2GRAY)
-# edges = cv2.Canny(gray, 50, 150)
-#
-# # Find the contours of the image
-# contours= (cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE))[1]
-
-# Calculate the minimum rotated bounding box around the contours
-# rect = cv2.minAreaRect(arr)
-# points = np.asarray(rotated_image).nonzero()
-# points = MultiPoint(points[::-1].T)
-# rectangle = points.minimum_bounding_rectangle(points)
-# bbox = rectangle.bounds
-
-print(rect)
-
-# img_draw = ImageDraw.Draw(rot_img)
-# print(final_corners[1])
-# img_draw.rectangle()
-
-rot_img.show()
-
-bgd_img.paste(rot_img, )
-
-# bgd_img.show()
+#BIG NOTE
+# Someone who knows how to do linear algebra figure out a way for us to use the amount we
+# rotate each target or seed[0] and the fact that the targets are a given size

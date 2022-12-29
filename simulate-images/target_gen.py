@@ -46,7 +46,7 @@ def gen_targets(amount):
 
         img = Image.new(mode="RGBA", size=vars.tar_res, color="white")
         img_draw = ImageDraw.Draw(img)
-        img_font = ImageFont.truetype("arial.ttf", 12)
+        img_font = ImageFont.truetype("special_imgs/arial.ttf", 12)
         img_fp = ("./target_images/"+"{},{},{},{},{}".format(tar_shapes[seed[0]], tar_colors_names[seed[1]], seed[2], seed[3],tar_colors_names[seed[4]]))+".png"
         # print(tar_colors[seed[1]])
         # print(ImageColor.getcolor([0,0,255],"RGBA"))

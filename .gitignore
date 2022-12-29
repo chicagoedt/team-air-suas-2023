@@ -4,3 +4,7 @@ __pycache__/
 *.code-workspace
 .idea/
 /simulate-images/target_images/
+/simulate-images/final_images/
+/simulate-images/master_images/
+
+
