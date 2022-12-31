@@ -38,6 +38,8 @@ feat: add objects to winch
 - code structure improvements
 ```
 
+See [here](https://www.conventionalcommits.org/en/v1.0.0-beta.2/) for more information.
+
 ### Merging
 
 On your branch, run `git rebase main` to pull the most recent changes to main into your branch (do this periodically, not just when you are finished). Resolve any merge conflicts as you go. When you're finished, squash your commits with `git rebase -i <commit-hash-before-your-first>` and change `pick` to `squash` or `s`.
