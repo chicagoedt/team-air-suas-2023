@@ -43,6 +43,9 @@ def generate_final(amount):
         bgd_img = bgd_img.convert("RGBA")
         # print(bgd_img.mode)
 
+
+
+
         rot_img = tar_img.rotate(seed[0],expand=True, fillcolor="#00000000")
         theta_rad = math.radians(seed[0])
         bbox = [0, 0, 0, 0]
@@ -76,9 +79,11 @@ def generate_final(amount):
         fnl_box = []
         corner = []
         rot_arr = []
+        rot_tht = 0
         while valid == False:
             rot = random.randint(0, 359)
             rot_tht = math.radians(rot)
+            print(rot)
             corner = [random.randint(0, bgd_img.width-1), random.randint(0, bgd_img.height-1)]
             # print(corner)
             box = [[0, 0], [4032, 0], [4032, 3040], [0, 3040]]
@@ -110,14 +115,44 @@ def generate_final(amount):
             bbox[i] = np.subtract(bbox[i], corner)
             print(bbox[i])
         print(rot_arr)
-        bbox = np.dot(bbox, rot_arr)
-
-        print(bbox)
+        # bbox = np.dot(bbox, rot_arr)
+        for i in range(len(bbox)):
+            bbox[i] = np.add(bbox[i], corner)
+            print(bbox[i])
+        print(list(bbox[0]))
+        print(list(bbox[1]))
 
         fnl_box = np.ravel(fnl_box)
+        test = ImageDraw.Draw(bgd_img)
+        test.line((list(bbox[0]) + list(bbox[1])), fill="Blue", width=3)
+        test.line((list(bbox[1]) + list(bbox[2])), fill="red", width=3)
+        test.line((list(bbox[2]) + list(bbox[3])), fill="red", width=3)
+        test.line((list(bbox[3]) + list(bbox[0])), fill="red", width=3)
+        test.ellipse((corner[0]-100,corner[1]-100,corner[0]+100,corner[1]+100), fill="Blue")
+        # bgd_img.show()
         fnl_img = bgd_img.transform((4032,3040), ImageTransform.QuadTransform(fnl_box))
+        test2 = ImageDraw.Draw(fnl_img)
+        print("test2")
+        rot_tht = 1/rot_tht
+        print(rot_tht)
+
+        rot_arr = np.linalg.inv([[math.cos(rot_tht), -1 * math.sin(rot_tht)], [math.sin(rot_tht), math.cos(rot_tht)]])
+        for i in range(len(bbox)):
+            bbox[i] = np.subtract(bbox[i], corner)
+            # print(bbox[i])
+        # print(rot_arr)
+        bbox = np.dot(bbox, rot_arr)
+        print(list(bbox[0]))
+        print(list(bbox[1]))
+        test2.line((list(bbox[0]) + list(bbox[1])), fill="Red", width=3)
+        test2.line((list(bbox[1]) + list(bbox[2])), fill="Purple", width=3)
+        test2.line((list(bbox[2]) + list(bbox[3])), fill="Purple", width=3)
+        test2.line((list(bbox[3]) + list(bbox[0])), fill="Purple", width=3)
+        test2.ellipse((-100,-100,100,100), fill="Yellow")
+
+
         print("{}_{}_{}_{}.jpg".format(seed[0],seed[1],seed[2],tar_path))
-        # fnl_img.show()
+        fnl_img.show()
         fnl_img.convert("RGB").save(final_dir+"{}_{}_{}_{}.jpg".format(seed[0],seed[1],seed[2],tar_path))
     return
 
