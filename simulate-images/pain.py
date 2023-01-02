@@ -9,6 +9,8 @@ from shapely import affinity
 import matplotlib.pyplot as plt
 import os
 
+
+
 def gen_valid_cam():
     bgd_img = Image.open("master_background.png")
     # global intersection
@@ -52,3 +54,45 @@ def gen_valid_cam():
                 print(intersection.exterior.coords)
                 return cam, intersection, bgd, rot
     return
+
+
+
+def gen_valid_tar(background,target):
+    minx,miny,maxx,maxy = background.bounds
+    print(minx,miny,maxx,maxy)
+    valid = False
+    corner = []
+    rot_arr = []
+    rot_tht = 0
+    while valid == False:
+        rot = random.randint(0, 359)
+        # rot = 0
+        print(rot)
+        corner = [random.randint(int(minx),int(maxx)),random.randint(int(miny),int(maxy))]
+        box = Polygon([[0, 0], [target.width, 0], [target.width, target.height], [0, target.height]])
+
+        dx = corner[0]
+        dy = corner[1]
+
+        box = affinity.rotate(box, rot, (0, 0))
+        box = affinity.translate(box,dx,dy)
+
+        plt.plot(*box.exterior.xy)
+        print(*box.exterior.coords)
+        if box.within(background):
+            valid = True
+            print("pog")
+            return box,rot
+        else:
+            valid = False
+
+
+
+
+# background = Polygon(((2633, 4032), (2736, 2412), (1927, 2316), (1823.5, 4032)))
+# target = Image.open("target_images/cross,Blue,Q,Yellow.png")
+# tar_poly = gen_valid_tar(background,target)
+# plt.plot(*(tar_poly.envelope).exterior.xy)
+# plt.plot(*(tar_poly).exterior.xy)
+# plt.plot(*background.exterior.xy)
+# plt.show()
