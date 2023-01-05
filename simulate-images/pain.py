@@ -12,9 +12,19 @@ import os
 
 
 
-def gen_valid_cam():
-    bgd_img = Image.open("master_background.png")
-    runway = Polygon(([2932, -2688], [2864, -3500], [6800, -3600], [6850, -2800]))
+def gen_valid_cam(bgd_img):
+    runway = Polygon((
+        (3033, -2693),
+        (2971, -3551),
+        (6754, -3670),
+        (6786, -2824)
+    ))
+    runway_flip = affinity.scale(runway,yfact=-1,origin=(0,0))
+    # runway_flip = affinity.scale(runway,yfact=,xfact=.95,origin="centroid")
+    # bgd_img_draw = ImageDraw.Draw(bgd_img)
+    print(*runway_flip.exterior.coords)
+    # bgd_img_draw.polygon(runway_flip.exterior.coords,fill="black")
+    # bgd_img.show()
     bgd = Polygon(([0, 0], [bgd_img.width, 0], [bgd_img.width, -1 * bgd_img.height], [0, -1 * bgd_img.height]))
     valid = False
     # print(valid)
@@ -29,10 +39,10 @@ def gen_valid_cam():
         print(corner)
         box = Polygon([[0, 0], [4032, 0], [4032, -3040], [0, -3040]])
         # print(box)
-        # plt.plot(*box.exterior.xy, label="pre", color="yellow")
+        plt.plot(*box.exterior.xy, label="pre", color="yellow")
 
         box = affinity.rotate(box,rot,(0,0))
-        # plt.plot(*box.exterior.xy, label = "rot", color="orange")
+        plt.plot(*box.exterior.xy, label = "rot", color="orange")
 
         # print(box)
         box = affinity.translate(box,xoff=corner[0],yoff=corner[1])
@@ -92,6 +102,20 @@ def gen_valid_tar(background,target):
 
 
 
+
+bgd_img = Image.open("master_background.png")
+cam, intersection, bgd, rot = gen_valid_cam(bgd_img)
+cam_fnl = affinity.scale(cam,yfact=-1, origin=(0,0))
+intersection = affinity.scale(intersection,yfact=-1, origin=(0,0))
+bgd = affinity.scale(bgd,yfact=-1, origin=(0,0))
+plt.plot(*cam_fnl.exterior.xy)
+plt.plot(*intersection.exterior.xy)
+plt.plot(*bgd.exterior.xy)
+plt.show()
+cam_fnl_xy = np.ravel((cam_fnl.exterior.coords[3]+cam_fnl.exterior.coords[4]+cam_fnl.exterior.coords[1]+cam_fnl.exterior.coords[2]))
+print(*cam_fnl.exterior.coords)
+test = bgd_img.transform((4032,3040),ImageTransform.QuadTransform(cam_fnl_xy))
+test.show()
 
 # background = Polygon(((2633, 4032), (2736, 2412), (1927, 2316), (1823.5, 4032)))
 # target = Image.open("target_images/cross,Blue,Q,Yellow.png")
