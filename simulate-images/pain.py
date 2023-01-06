@@ -28,16 +28,16 @@ def gen_valid_cam(bgd_img):
         # print(corner)
         box = Polygon([[0, 0], [4032, 0], [4032, -3040], [0, -3040]])
         # print(box)
-        plt.plot(*box.exterior.xy, label="pre", color="yellow")
+        # plt.plot(*box.exterior.xy, label="pre", color="yellow")
 
         box = affinity.rotate(box,rot,(0,0))
-        plt.plot(*box.exterior.xy, label = "rot", color="orange")
+        # plt.plot(*box.exterior.xy, label = "rot", color="orange")
 
         # print(box)
         box = affinity.translate(box,xoff=corner[0],yoff=corner[1])
         # print(valid)
         # print(box)
-        plt.plot(*box.exterior.xy, label = "final", color="Red")
+        # plt.plot(*box.exterior.xy, label = "final", color="Red")
 
         # plt.show()
         # sleep(10)
@@ -121,8 +121,8 @@ def fnl_valid_img(amount):
         cam, intersection, bgd, cropped = gen_valid_cam(bgd_img)
 
         # plt.show()
-        bgd_img_drw = ImageDraw.Draw(cropped)
-        bgd_img_drw.polygon(bgd.exterior.coords,fill="Black")
+        # bgd_img_drw = ImageDraw.Draw(cropped)
+        # bgd_img_drw.polygon(bgd.exterior.coords,fill="Black")
         # cropped.show()
 
         tar_files = os.listdir("target_images")
@@ -132,8 +132,17 @@ def fnl_valid_img(amount):
 
         box, rot, crop_img, box_real = gen_valid_tar(cropped,bgd,tar_img)
 
-        new_drw = ImageDraw.Draw(crop_img)
-        new_drw.polygon(box_real.exterior.coords,fill="white")
+        # new_drw = ImageDraw.Draw(crop_img)
+        # new_drw.polygon(box_real.exterior.coords,fill="white")
 
         final_dir = "final_images/"
-        crop_img.save(final_dir+"{}_{}_{}_{}.png".format(box_real.exterior.coords))
+        crop_img = crop_img.convert("RGB")
+        crop_img.save(final_dir+"{}_{}_{}_{}.jpg".format(*box_real.exterior.coords))
+
+
+# import pain
+# import time
+# start_time = time.time()
+# fnl_valid_img(1)
+# print("My program took", time.time() - start_time, "to run")
+
