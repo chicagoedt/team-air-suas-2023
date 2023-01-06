@@ -22,7 +22,7 @@ def gen_valid_cam(bgd_img):
     runway_flip = affinity.scale(runway,yfact=-1,origin=(0,0))
     # runway_flip = affinity.scale(runway,yfact=,xfact=.95,origin="centroid")
     # bgd_img_draw = ImageDraw.Draw(bgd_img)
-    print(*runway_flip.exterior.coords)
+    # print(*runway_flip.exterior.coords)
     # bgd_img_draw.polygon(runway_flip.exterior.coords,fill="black")
     # bgd_img.show()
     bgd = Polygon(([0, 0], [bgd_img.width, 0], [bgd_img.width, -1 * bgd_img.height], [0, -1 * bgd_img.height]))
@@ -36,7 +36,7 @@ def gen_valid_cam(bgd_img):
         # print(rot)
         # print(rot)
         corner = [random.randint(0, bgd_img.width - 1), random.randint(-1*(bgd_img.height - 1),0)]
-        print(corner)
+        # print(corner)
         box = Polygon([[0, 0], [4032, 0], [4032, -3040], [0, -3040]])
         # print(box)
         plt.plot(*box.exterior.xy, label="pre", color="yellow")
@@ -47,7 +47,7 @@ def gen_valid_cam(bgd_img):
         # print(box)
         box = affinity.translate(box,xoff=corner[0],yoff=corner[1])
         # print(valid)
-        print(box)
+        # print(box)
         plt.plot(*box.exterior.xy, label = "final", color="Red")
 
         # plt.show()
@@ -59,8 +59,8 @@ def gen_valid_cam(bgd_img):
             else:
                 print("pog")
                 intersection = box.intersection(runway)
-                print(*box.exterior.coords)
-                print(*intersection.exterior.coords)
+                # print(*box.exterior.coords)
+                # print(*intersection.exterior.coords)
                 valid = True
                 plt.plot(*intersection.exterior.xy)
                 plt.show()
@@ -105,16 +105,43 @@ def gen_valid_tar(background,target):
 
 bgd_img = Image.open("master_background.png")
 cam, intersection, bgd, rot = gen_valid_cam(bgd_img)
-cam_fnl = affinity.scale(cam,yfact=-1, origin=(0,0))
-intersection = affinity.scale(intersection,yfact=-1, origin=(0,0))
+# print(cam.bounds,"bounds")
+# minx = cam.bounds[0]
+# maxy = cam.bounds[3]
+print(cam.exterior.coords[0])
+cam_trans = affinity.translate(cam,xoff=-1 * cam.exterior.coords[0][0], yoff=-1 * cam.exterior.coords[0][1])
+inter_trans= affinity.translate(intersection,xoff=-1 * cam.exterior.coords[0][0], yoff=-1 * cam.exterior.coords[0][1])
+
+inter_rot = affinity.rotate(inter_trans,180,origin=(cam_trans.centroid))
+
+# # print(intersection_shifted, "new intersection")
+# # cam_shifted = affinity.interpret_origin(cam,cam[0],2)
+# # print(cam_shifted, "new cam")
+cam_fnl = affinity.scale(cam_trans,yfact=-1, origin=(0,0))
+cam_fnl_crop = affinity.scale(cam,yfact=-1, origin=(0,0))
+
+inter_fnl = affinity.scale(inter_rot,yfact=-1, origin=(0,0))
+
+inter_fnl = affinity.scale(inter_fnl,xfact=-1, origin=(cam_fnl.centroid))
+
 bgd = affinity.scale(bgd,yfact=-1, origin=(0,0))
-plt.plot(*cam_fnl.exterior.xy)
+plt.plot(*cam_trans.exterior.xy)
+plt.plot(*cam.exterior.xy)
 plt.plot(*intersection.exterior.xy)
-plt.plot(*bgd.exterior.xy)
+plt.plot(*inter_trans.exterior.xy)
+plt.plot(*inter_fnl.exterior.xy)
+plt.plot(*cam_fnl.exterior.xy)
+
+
+
+# plt.plot(*bgd.exterior.xy)
 plt.show()
-cam_fnl_xy = np.ravel((cam_fnl.exterior.coords[3]+cam_fnl.exterior.coords[4]+cam_fnl.exterior.coords[1]+cam_fnl.exterior.coords[2]))
-print(*cam_fnl.exterior.coords)
+cam_fnl_xy = np.ravel((cam_fnl_crop.exterior.coords[3]+cam_fnl_crop.exterior.coords[4]+cam_fnl_crop.exterior.coords[1]+cam_fnl_crop.exterior.coords[2]))
+print(*cam_fnl_crop.exterior.coords)
+
 test = bgd_img.transform((4032,3040),ImageTransform.QuadTransform(cam_fnl_xy))
+bgd_img_drw = ImageDraw.Draw(test)
+bgd_img_drw.polygon(inter_fnl.exterior.coords,fill="Black")
 test.show()
 
 # background = Polygon(((2633, 4032), (2736, 2412), (1927, 2316), (1823.5, 4032)))
