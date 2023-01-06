@@ -30,8 +30,8 @@ def gen_valid_cam(bgd_img):
     # print(valid)
     # global box, intersection, rot_tht
     while valid == False:
-        # rot = random.randint(0, 359)
-        rot = 0
+        rot = random.randint(0, 359)
+        # rot = 0
         rot_tht = math.radians(rot)
         # print(rot)
         # print(rot)
@@ -105,19 +105,16 @@ def gen_valid_tar(background,target):
 
 bgd_img = Image.open("master_background.png")
 cam, intersection, bgd, rot = gen_valid_cam(bgd_img)
-# print(cam.bounds,"bounds")
-# minx = cam.bounds[0]
-# maxy = cam.bounds[3]
+
 print(cam.exterior.coords[0])
 cam_trans = affinity.translate(cam,xoff=-1 * cam.exterior.coords[0][0], yoff=-1 * cam.exterior.coords[0][1])
 inter_trans= affinity.translate(intersection,xoff=-1 * cam.exterior.coords[0][0], yoff=-1 * cam.exterior.coords[0][1])
 
-inter_rot = affinity.rotate(inter_trans,180,origin=(cam_trans.centroid))
+inter_rot1 = affinity.rotate(inter_trans,-1*rot,origin=(0,0))
+cam_rot = affinity.rotate(cam_trans,-1*rot,origin=(0,0))
+inter_rot = affinity.rotate(inter_rot1,180,origin=(cam_rot.centroid))
 
-# # print(intersection_shifted, "new intersection")
-# # cam_shifted = affinity.interpret_origin(cam,cam[0],2)
-# # print(cam_shifted, "new cam")
-cam_fnl = affinity.scale(cam_trans,yfact=-1, origin=(0,0))
+cam_fnl = affinity.scale(cam_rot,yfact=-1, origin=(0,0))
 cam_fnl_crop = affinity.scale(cam,yfact=-1, origin=(0,0))
 
 inter_fnl = affinity.scale(inter_rot,yfact=-1, origin=(0,0))
@@ -125,16 +122,16 @@ inter_fnl = affinity.scale(inter_rot,yfact=-1, origin=(0,0))
 inter_fnl = affinity.scale(inter_fnl,xfact=-1, origin=(cam_fnl.centroid))
 
 bgd = affinity.scale(bgd,yfact=-1, origin=(0,0))
-plt.plot(*cam_trans.exterior.xy)
 plt.plot(*cam.exterior.xy)
 plt.plot(*intersection.exterior.xy)
-plt.plot(*inter_trans.exterior.xy)
+plt.plot(*inter_rot1.exterior.xy)
+plt.plot(*cam_rot.exterior.xy)
+
 plt.plot(*inter_fnl.exterior.xy)
 plt.plot(*cam_fnl.exterior.xy)
 
 
 
-# plt.plot(*bgd.exterior.xy)
 plt.show()
 cam_fnl_xy = np.ravel((cam_fnl_crop.exterior.coords[3]+cam_fnl_crop.exterior.coords[4]+cam_fnl_crop.exterior.coords[1]+cam_fnl_crop.exterior.coords[2]))
 print(*cam_fnl_crop.exterior.coords)
@@ -143,11 +140,3 @@ test = bgd_img.transform((4032,3040),ImageTransform.QuadTransform(cam_fnl_xy))
 bgd_img_drw = ImageDraw.Draw(test)
 bgd_img_drw.polygon(inter_fnl.exterior.coords,fill="Black")
 test.show()
-
-# background = Polygon(((2633, 4032), (2736, 2412), (1927, 2316), (1823.5, 4032)))
-# target = Image.open("target_images/cross,Blue,Q,Yellow.png")
-# tar_poly = gen_valid_tar(background,target)
-# plt.plot(*(tar_poly.envelope).exterior.xy)
-# plt.plot(*(tar_poly).exterior.xy)
-# plt.plot(*background.exterior.xy)
-# plt.show()
