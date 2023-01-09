@@ -1,14 +1,9 @@
-from PIL import Image, ImageDraw, ImageOps
-import math
-from time import sleep
+from PIL import Image, ImageDraw, ImageTransform
 import vars
 import numpy as np
 import random
-from PIL import ImageTransform
-from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 from shapely import affinity
-import matplotlib.pyplot as plt
 import os
 
 
@@ -26,7 +21,7 @@ def gen_valid_cam(bgd_img):
         rot = random.randint(0, 359)
         corner = [random.randint(0, bgd_img.width - 1), random.randint(-1*(bgd_img.height - 1),0)]
         # print(corner)
-        box = Polygon([[0, 0], [4032, 0], [4032, -3040], [0, -3040]])
+        box = Polygon([[0, 0], [vars.cam_res[0], 0], [vars.cam_res[0], -1*vars.cam_res[1]], [0, -1*vars.cam_res[1]]])
         # print(box)
         # plt.plot(*box.exterior.xy, label="pre", color="yellow")
 
@@ -51,7 +46,7 @@ def gen_valid_cam(bgd_img):
                 # print(*box.exterior.coords)
                 # print(*intersection.exterior.coords)
                 valid = True
-                plt.plot(*intersection.exterior.xy)
+                # plt.plot(*intersection.exterior.xy)
                 # plt.show()
 
                 inter_trans = affinity.translate(intersection, xoff=-1 * corner[0],yoff=-1 * corner[1])
@@ -84,16 +79,16 @@ def gen_valid_tar(crop_img,runway_geom,target):
         box = Polygon([[0, 0], [target.width, 0], [target.width, target.height], [0, target.height]])
 
         # print(box)
-        plt.plot(*box.exterior.xy, label="pre", color="yellow")
+        # plt.plot(*box.exterior.xy, label="pre", color="yellow")
 
         box = affinity.rotate(box,rot,(0,0))
-        plt.plot(*box.exterior.xy, label = "rot", color="orange")
+        # plt.plot(*box.exterior.xy, label = "rot", color="orange")
 
         # print(box)
         box = affinity.translate(box,xoff=corner[0],yoff=corner[1])
         # print(valid)
         # print(box)
-        plt.plot(*box.exterior.xy, label = "final", color="Red")
+        # plt.plot(*box.exterior.xy, label = "final", color="Red")
 
         print(*box.exterior.coords)
         if box.within(runway_geom):
@@ -141,8 +136,8 @@ def fnl_valid_img(amount):
 
 
 # import pain
-# import time
-# start_time = time.time()
-# fnl_valid_img(1)
-# print("My program took", time.time() - start_time, "to run")
+import time
+start_time = time.time()
+fnl_valid_img(10)
+print("My program took", time.time() - start_time, "to run")
 

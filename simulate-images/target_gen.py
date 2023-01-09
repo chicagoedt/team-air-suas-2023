@@ -38,7 +38,7 @@ tar_colors_names=[
 ]
 def gen_targets(amount):
     for x in range(amount):
-        rand_color = random.sample(range(9), k=2)
+        rand_color = random.sample(range(10), k=2)
         seed = [random.randint(0,12),rand_color[0],chr(random.randint(65,90)), rand_color[1]]
         # seed = [6, 4, chr(65), 0]
         #first is selecting a random shape from tar_shape, second is random from colors, thrid is the letter, 4 is rotation
@@ -75,4 +75,4 @@ def gen_targets(amount):
         img.save(img_fp,format="PNG")
     return
 
-gen_targets(10)
+# gen_targets(10)
