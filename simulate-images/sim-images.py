@@ -84,23 +84,29 @@ def generateEmptyImages(runway):
 # create and place a target on the empty image
 def placeTarget(image, filename, num):
     newFilename = filename[:-4] + f"_tar_{num:03}"
+    image = image.convert("RGBA")
 
     # TODO (adam): sometimes generate a second target 30 ft away
-    # create the target and choose a random location
-    targetImage, targetPolygon, targetSeed = createTarget()
-    targetPolygon = moveTarget(targetPolygon)
     # TODO (adam): save seed to csv
 
-    # create yolo file for target
-    # TODO (adam): add second target if necessary
-    yoloString = writeYolo(targetPolygon)
-    with open(os.path.join(vars.targetDir, newFilename + ".yolo"), "w") as yoloFile:
-        yoloFile.write(yoloString)
+    newTarget = True
+    while newTarget:
+        # create the target and choose a random location
+        targetImage, targetPolygon, targetSeed = createTarget()
+        targetPolygon = moveTarget(targetPolygon)
 
-    # place target on image
-    xMin, yMin, xMax, yMax = [int(b) for b in targetPolygon.bounds]
-    image = image.convert("RGBA")
-    image.alpha_composite(targetImage, dest=(xMin, yMin))
+        # create yolo file for target
+        yoloString = writeYolo(targetPolygon)
+        with open(os.path.join(vars.targetDir, newFilename + ".yolo"), "w") as yoloFile:
+            yoloFile.write(yoloString)
+
+        # place target on image
+        xMin, yMin, xMax, yMax = [int(b) for b in targetPolygon.bounds]
+        image.alpha_composite(targetImage, dest=(xMin, yMin))
+        
+        newTarget = False
+
+    # save image
     image = image.convert("RGB")
     image.save(os.path.join(vars.targetDir, newFilename + ".jpg"))
 
