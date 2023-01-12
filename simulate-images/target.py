@@ -43,7 +43,7 @@ def createTarget():
     }
 
     # open a new image
-    img = Image.new(mode="RGBA", size=vars.targetSize, color="white")
+    img = Image.new(mode="RGBA", size=vars.targetSize, color="#0000")
     img_draw = ImageDraw.Draw(img)
     img_font = ImageFont.truetype(
         vars.resourceDir + "arial.ttf", int(vars.targetSize[0] / 2))
