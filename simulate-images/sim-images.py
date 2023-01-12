@@ -20,7 +20,7 @@ def main():
     generateNew = True
     if os.path.exists(vars.noTargetDir):
         generateNew = input(
-            "Looks like you have already generated empty runway images. Would you like to generate new ones?\n  (y/N) >> ")
+            "\nLooks like you have already generated empty runway images. Would you like to generate new ones?\n  (y/N) >> ")
         generateNew = True if generateNew == "y" else False
 
     if generateNew:
@@ -32,30 +32,17 @@ def main():
     numSnapshots = len(os.listdir(vars.noTargetDir))
 
     numTargets = int(
-        input("\nHow many targets do you want to generate per snapshot? >> "))
-    print(f"Generating {numTargets * numSnapshots} targets...")
+        input("\nHow many target images do you want to generate for each snapshot? >> "))
+    print(f"\nGenerating {numTargets * numSnapshots} target images...\n")
 
     start_time = time.time()
-
-    # check if target directory exists
-    if os.path.exists(vars.targetDir):
-        rmtree(vars.targetDir)
-    os.makedirs(vars.targetDir)
-
-    # create target images for each empty image
-    for filename in os.listdir(vars.noTargetDir):
-        print(f"Placing targets on {filename}...")
-        with Image.open(os.path.join(vars.noTargetDir, filename)) as emptyImage:
-            for targetNum in range(numTargets):
-                with emptyImage as newImage:
-                    placeTarget(newImage, filename, targetNum)
-
-    print(f"time: {time.time() - start_time:.2f} seconds")
+    generateTargetImages(numTargets)
+    print(f"\ntime: {time.time() - start_time:.2f} seconds\n")
 
 
 # create the runway images that the targets will be placed on
 def generateEmptyImages(runway):
-    print("Generating empty images...")
+    print("\nGenerating empty images...")
     start_time = time.time()
 
     # create snapshot polygon and shift it to the upper right corner of the air drop boundary
@@ -81,25 +68,66 @@ def generateEmptyImages(runway):
     print(f"time: {time.time() - start_time:.2f} seconds")
 
 
+# create runway images with targets on them
+def generateTargetImages(num):
+    # check if target directory exists
+    if os.path.exists(vars.targetDir):
+        rmtree(vars.targetDir)
+    os.makedirs(vars.targetDir)
+    
+    # remove target-info.csv if it exists
+    if os.path.exists(vars.targetInfoPath):
+        os.remove(vars.targetInfoPath)
+    with open(vars.targetInfoPath, "w") as info:
+        info.write("filename,shape,shapeColor,letter,letterColor\n")
+
+    # create <num> simulated images for each empty image
+    for filename in os.listdir(vars.noTargetDir):
+        print(f"Simulating targets for {filename}")
+        with Image.open(os.path.join(vars.noTargetDir, filename)) as emptyImage:
+            for i in range(num):
+                with emptyImage as simImage:
+                    simImage = simImage.convert("RGBA")
+                    simFilename = filename[:-4] + f"_tar_{i:03}"
+
+                    t1 = placeTarget(simImage, simFilename)
+                    t2 = placeTarget(simImage, simFilename, t1)
+
+                    # save image
+                    simImage = simImage.convert("RGB")
+                    simImage.save(os.path.join(vars.targetDir, simFilename + ".jpg"))
+
+
 # create and place a target on the empty image
-def placeTarget(image, filename, num):
-    newFilename = filename[:-4] + f"_tar_{num:03}"
-
+def placeTarget(image, filename, t1=None):
     # create the target and choose a random location
-    targetImage, targetPolygon = createTarget()
-    targetPolygon = moveTarget(targetPolygon)
+    targetImage, targetPolygon, targetSeed = createTarget()
+    targetPolygon = moveTarget(targetPolygon, t1)
 
-    # create yolo file for target
+    # DEBUG: check if a second target was placed
+    if t1 != None:
+        if targetPolygon == None:
+            return None
+        else:
+            print(f"  {filename} has 2 targets")
+
+    # save seed to csv
+    with open(vars.targetInfoPath, "a") as info:
+        seed = [i for i in targetSeed.values()][:4]
+        info.write(f"{filename},{','.join(seed)}\n")
+
+    # create/write to yolo file for target
     yoloString = writeYolo(targetPolygon)
-    with open(os.path.join(vars.targetDir, newFilename + ".yolo"), "w") as yoloFile:
-        yoloFile.write(yoloString)
+    yoloPath = os.path.join(vars.targetDir, filename + ".yolo")
+    mode = "a" if os.path.exists(yoloPath) else "w"
+    with open(yoloPath, mode) as yoloFile:
+        yoloFile.write(yoloString + "\n")
 
     # place target on image
     xMin, yMin, xMax, yMax = [int(b) for b in targetPolygon.bounds]
-    image = image.convert("RGBA")
     image.alpha_composite(targetImage, dest=(xMin, yMin))
-    image = image.convert("RGB")
-    image.save(os.path.join(vars.targetDir, newFilename + ".jpg"))
+
+    return targetPolygon
 
 
 # write the yolo file containing the location of the target on the image
