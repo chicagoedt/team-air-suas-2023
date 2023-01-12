@@ -85,11 +85,14 @@ def generateEmptyImages(runway):
 def placeTarget(image, filename, num):
     newFilename = filename[:-4] + f"_tar_{num:03}"
 
+    # TODO (adam): sometimes generate a second target 30 ft away
     # create the target and choose a random location
     targetImage, targetPolygon, targetSeed = createTarget()
     targetPolygon = moveTarget(targetPolygon)
+    # TODO (adam): save seed to csv
 
     # create yolo file for target
+    # TODO (adam): add second target if necessary
     yoloString = writeYolo(targetPolygon)
     with open(os.path.join(vars.targetDir, newFilename + ".yolo"), "w") as yoloFile:
         yoloFile.write(yoloString)
