@@ -7,6 +7,7 @@ from shapely.geometry import box
 noTargetDir = "snapshots/no-target/"
 targetDir = "snapshots/target/"
 resourceDir = "target-resources/"
+targetInfoPath = "snapshots/target-info.csv"
 
 # constants
 sensorSize = 7.9  # mm
