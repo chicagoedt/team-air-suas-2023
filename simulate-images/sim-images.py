@@ -36,26 +36,7 @@ def main():
     print(f"Generating {numTargets * numSnapshots} target images...")
 
     start_time = time.time()
-
-    # check if target directory exists
-    if os.path.exists(vars.targetDir):
-        rmtree(vars.targetDir)
-    os.makedirs(vars.targetDir)
-    
-    # remove target-info.csv if it exists
-    if os.path.exists(vars.targetInfoPath):
-        os.remove(vars.targetInfoPath)
-    with open(vars.targetInfoPath, "w") as info:
-        info.write("filename,shape,shapeColor,letter,letterColor\n")
-
-    # create target images for each empty image
-    for filename in os.listdir(vars.noTargetDir):
-        print(f"Placing targets on {filename}...")
-        with Image.open(os.path.join(vars.noTargetDir, filename)) as emptyImage:
-            for targetNum in range(numTargets):
-                with emptyImage as newImage:
-                    placeTarget(newImage, filename, targetNum)
-
+    generateTargetImages(numTargets)
     print(f"time: {time.time() - start_time:.2f} seconds")
 
 
@@ -85,6 +66,28 @@ def generateEmptyImages(runway):
         snapshot = shiftSnapshot(snapshot)
 
     print(f"time: {time.time() - start_time:.2f} seconds")
+
+
+# create runway images with targets on them
+def generateTargetImages(num):
+    # check if target directory exists
+    if os.path.exists(vars.targetDir):
+        rmtree(vars.targetDir)
+    os.makedirs(vars.targetDir)
+    
+    # remove target-info.csv if it exists
+    if os.path.exists(vars.targetInfoPath):
+        os.remove(vars.targetInfoPath)
+    with open(vars.targetInfoPath, "w") as info:
+        info.write("filename,shape,shapeColor,letter,letterColor\n")
+
+    # create target images for each empty image
+    for filename in os.listdir(vars.noTargetDir):
+        print(f"Placing targets on {filename}...")
+        with Image.open(os.path.join(vars.noTargetDir, filename)) as emptyImage:
+            for targetNum in range(num):
+                with emptyImage as newImage:
+                    placeTarget(newImage, filename, targetNum)
 
 
 # create and place a target on the empty image
