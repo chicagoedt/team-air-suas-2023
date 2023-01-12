@@ -32,8 +32,8 @@ def main():
     numSnapshots = len(os.listdir(vars.noTargetDir))
 
     numTargets = int(
-        input("\nHow many targets do you want to generate per snapshot? >> "))
-    print(f"Generating {numTargets * numSnapshots} targets...")
+        input("\nHow many target images do you want to generate for each snapshot? >> "))
+    print(f"Generating {numTargets * numSnapshots} target images...")
 
     start_time = time.time()
 
@@ -86,7 +86,7 @@ def placeTarget(image, filename, num):
     newFilename = filename[:-4] + f"_tar_{num:03}"
 
     # create the target and choose a random location
-    targetImage, targetPolygon = createTarget()
+    targetImage, targetPolygon, targetSeed = createTarget()
     targetPolygon = moveTarget(targetPolygon)
 
     # create yolo file for target
