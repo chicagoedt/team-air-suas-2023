@@ -10,13 +10,14 @@ Members:
 - Kaloyan Stalev (Co-Captain)
 - Adam Beigel (Co-Captain)
 - Davin Doan
+- Hisham Elseweifi
 - Omar Hasan
 - Sri Karnati
 - Yuseok Lee
 - Ivan Martinez
 - Manh Phan
 - Advik Sikligar
+- Karam Suleiman
 - Frank Tarshis
 - Adrian Tse
 - Adrian Velzaquez
-
