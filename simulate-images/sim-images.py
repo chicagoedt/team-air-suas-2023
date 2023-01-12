@@ -41,6 +41,12 @@ def main():
     if os.path.exists(vars.targetDir):
         rmtree(vars.targetDir)
     os.makedirs(vars.targetDir)
+    
+    # remove target-info.csv if it exists
+    if os.path.exists(vars.targetInfoPath):
+        os.remove(vars.targetInfoPath)
+    with open(vars.targetInfoPath, "w") as info:
+        info.write("filename,shape,shapeColor,letter,letterColor\n")
 
     # create target images for each empty image
     for filename in os.listdir(vars.noTargetDir):
@@ -87,13 +93,17 @@ def placeTarget(image, filename, num):
     image = image.convert("RGBA")
 
     # TODO (adam): sometimes generate a second target 30 ft away
-    # TODO (adam): save seed to csv
 
     newTarget = True
     while newTarget:
         # create the target and choose a random location
         targetImage, targetPolygon, targetSeed = createTarget()
         targetPolygon = moveTarget(targetPolygon)
+
+        # save seed to csv
+        with open(vars.targetInfoPath, "a") as info:
+            seed = [i for i in targetSeed.values()][:4]
+            info.write(f"{newFilename},{','.join(seed)}\n")
 
         # create yolo file for target
         yoloString = writeYolo(targetPolygon)
