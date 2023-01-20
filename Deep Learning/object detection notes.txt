@@ -1,0 +1,32 @@
+Project requirements:
+- CNN model pytorch (basically yolo)
+- object detection for polygon
+- object detection for letter
+- color detection ???????????????
+
+
+Comp requirements:
+-  >=75 feet in the air
+- picture:
+	- colored paper cut out from polygon
+	- different colored letter or number on polygon
+	- dimensions 8.5 x 11 inches
+- mannequin
+	- ignore for now?
+
+
+Notes:
+- yolo takes care of points 1-3?
+- Shane joy will help teach us how to use this
+	- he already has letter detection that works 90%
+	- will teach us how to easily use pytorch
+- ask shane about running polygon and letter detection within same model??
+
+
+plan for moving forward????
+- aim to get the training finalized by february 11th
+1) Create testing images
+2) create/ use training model for pytorch
+3) Test realtime detection "on the bench" (feb 11th)
+4) fly dummy drone with object detection over field
+	- checkerboard RC club
