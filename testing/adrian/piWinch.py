@@ -3,5 +3,5 @@ from time import sleep
 
 winch = Servo(14)
 winch.max()
-sleep(5)
+sleep(9)
 winch.value = 0
