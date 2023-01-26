@@ -124,6 +124,11 @@ def placeTarget(image, filename, num):
     image.save(os.path.join(vars.targetDir, newFilename + ".jpg"))
 
 
+    target_image = image.crop((xMin-10, yMin-10, xMax+10, yMax+10))
+    targetName = filename[:-4] + f"_tar_{num:03}_" + targetSeed["letter"]
+    target_image.save(os.path.join(vars.targetDir, targetName + ".jpg"))
+
+
 # write the yolo file containing the location of the target on the image
 def writeYolo(polygon):
     xMin, yMin, xMax, yMax = [int(b) for b in polygon.bounds]
