@@ -14,5 +14,7 @@ __pycache__/
 simulate-images/snapshots/
 simulate-images/target_images/*
 simulate-images/final_images/*
+datas/
 *.png~
 *.xcf
+
