@@ -1,7 +1,20 @@
+# system
 .DS_store
+
+# python
 __pycache__/
+.ipynb_checkpoints/
+
+# editor
 .vscode/
 *.code-workspace
 .idea/
-.ipynb_checkpoints/
+
+# files
+simulate-images/snapshots/
+simulate-images/target_images/*
+simulate-images/final_images/*
 datas/
+*.png~
+*.xcf
+
