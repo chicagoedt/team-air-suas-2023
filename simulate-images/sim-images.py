@@ -118,7 +118,7 @@ def placeTarget(image, filename, t1=None):
 
     # create/write to yolo file for target
     yoloString = writeYolo(targetPolygon)
-    yoloPath = os.path.join(vars.targetDir, filename + ".yolo")
+    yoloPath = os.path.join(vars.targetDir, filename + ".txt")
     mode = "a" if os.path.exists(yoloPath) else "w"
     with open(yoloPath, mode) as yoloFile:
         yoloFile.write(yoloString + "\n")
