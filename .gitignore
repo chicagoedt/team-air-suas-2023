@@ -15,6 +15,7 @@ simulate-images/snapshots/
 simulate-images/target_images/*
 simulate-images/final_images/*
 datas/
+yolov7/
 *.png~
 *.xcf
 
