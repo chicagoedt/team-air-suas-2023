@@ -29,8 +29,8 @@ def findShape(img):
     # opencv detects many contours within the image
     # including the image shape itself (which is index 0 and should be ignored)
     contourCount = 0
-    if DEBUG:
-        print("Found contours: ", len(contours))
+    # if DEBUG: 
+    #     print("Found contours: ", len(contours)) # commented by MANH
     for contour in contours:
         cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
         approx = cv2.approxPolyDP(contour, 0.01 * cv2.arcLength(contour, True), True)
@@ -39,14 +39,14 @@ def findShape(img):
             x = int(M['m10'] / M['m00'])
             y = int(M['m01'] / M['m00'])
             shapeInfo.append((x, y, len(approx)))
-            if DEBUG:
-                print("Contour #: ", contourCount, "Number of points: ", len(approx), "Location: ({},{})".format(x, y))
+            # if DEBUG:
+            #     print("Contour #: ", contourCount, "Number of points: ", len(approx), "Location: ({},{})".format(x, y)) # commented by MANH
         contourCount += 1
 
     # Getting the points count that appears the most in the shapeInfo list
     _, _, contourModeCount = max(set(shapeInfo), key=shapeInfo.count)
-    if DEBUG:
-        print("The most occurring shape in this image has {} points".format(contourModeCount))
+    # if DEBUG:
+    #     print("The most occurring shape in this image has {} points".format(contourModeCount)) # commented by MANH
 
     # Getting the average coordinates for the shape with found contourModeCount value
     xSum = 0
@@ -54,7 +54,7 @@ def findShape(img):
     i = 0
     for shape in shapeInfo:
         if shape[2] == contourModeCount:
-            if DEBUG: print("Iterating thru: ", shape)
+            # if DEBUG: print("Iterating thru: ", shape) # commented by MANH
             xSum = xSum + shape[0]
             ySum = ySum + shape[1]
             i += 1
