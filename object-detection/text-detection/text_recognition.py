@@ -73,6 +73,24 @@ def readImgDetectLetter(img, step):
     print(results)
     return results
 
+def readImgPathDetectLetter(img_path, newWidth, step):
+    # read img
+    img = cv2.imread(img_path)
+
+    # img preprocessing it, scale it to newWidth
+    imgScaled = scaleImg(img, newWidth)
+    # blur and gray scale the frame
+    imgBlur = cv2.GaussianBlur(imgScale, (7,7), 1)
+    imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
+
+    # create rotations_list
+    results = readImgDetectLetter(imgGray, step)
+    return results
+
+    
+
+    
+
 
 
 

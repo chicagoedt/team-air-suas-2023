@@ -1,20 +1,47 @@
-import easyocr 
-import cv2 # img processing
+# Import some dependecies
+from text_recognition import *
+import os
 
-img_path = 'non scaled a.png'
+# some helper functions
 
-# read img -> matrix
-img = cv2.imread(img_path)
+# test accuracy of the model by iterating all files in the folder
+def getAccuracyOfTextDetection(folder_path, newWidth, step):
 
-# scale the img
-sc
+    # set up list of target filenames and list of answers list
+    targets_list = [i for i in os.listdir(folder_path) if (len(i) == 21 and not os.path.isdir(i))]
+    targets_list.sort()
+    answers_list = [i[-5] for i in targets_list]
 
-# initialize the easyocr model
-Reader = easyocr.Reader(['en'])
+    num_targets = len(targets_list)
+    incorrectTargets = []
+    correct = 0
+    newWidth = 500
+    step = 20
+    
+    # for each target in targets_list
+    for i in range(num_targets):
+        target_path = os.path.join(folder_path, targets_list[i])
 
-# img matrix input ->easyocr-> output
-result = Reader.readtext(img)
-print(result)
-print(type(result))
+        # pass target to text detection model, follow step by step: read, img preprocessing, pass it to model to get output, and compare two results
+        results = readImgPathDetectLetter(target_path, newWidth, step)
+        if len(results) == 0:
+            incorrectTargets.append(targets_list[i])
+            continue
+        else:
+            if answers_list[i] == results[1]:
+                correct += 1
+            # special case
+            else:
+                incorrectTargets.append(targets_list[i])
+                continue
 
-# show img with a bounding box
+
+
+    pass
+
+
+
+# folder path that contains file 
+folder_path = ''
+newWidth = 500
+step = 20

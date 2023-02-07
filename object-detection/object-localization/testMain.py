@@ -2,6 +2,7 @@ import cv2
 import ShapeDetector 
 import os 
 import math
+import shutil
 
 # get the expected coordinates 
 def calculateExpectedCoord (img_path, yolo_path):
@@ -32,8 +33,9 @@ def isCoordCorrect( expectedCoord, foundCoord, maxDistance):
 # maxDistance is the distance that defines the valid range between foundCoord and expectedCoord
 def checkAccuracyOfLocalization(folder_path, maxDistance):
     # get lists of file
-    files_list = os.listdir(folder_path)
+    files_list = [i for i in os.listdir(folder_path) if not os.path.isdir(i)]
     files_list.sort() # sort them in order so each jpg file is adjacent to its corresponding yolo file
+    files_list.pop(0) # use this to remove file .pybn_checkpoints
 
     correct = 0
     totalImages = int(len(files_list) / 2)
@@ -70,17 +72,30 @@ def checkAccuracyOfLocalization(folder_path, maxDistance):
             continue
         print('-----------------------------------')
 
-    # print(errorFiles)  # uncomment to show all files that ShapeDetector finds trouble to process
-    # print(incorrect) # uncomment to show all files that ShapeDetector fails 
+    print(errorFiles)  # uncomment to show all files that ShapeDetector finds trouble to process
+    print(incorrect) # uncomment to show all files that ShapeDetector fails 
+    print('Number of files failed:', len(incorrect))
     print('Number of errorFiles:', len(errorFiles))
     accuracy = round(correct / (totalImages), 3)
-    return accuracy
+    return accuracy, errorFiles, incorrect
+
+# got copy all files into a folder_path
+def copyFilesToNewFolder(files_list, srcfolder_path, dstfolder_path):
+    for i in range(len(files_list)):
+        img_path = os.path.join(srcfolder_path, files_list[i])
+        yolo_path = os.path.join(folder_path, files_list[i + 1])
+
+        # copy files to folder
+        
+    
+
+
 
 #------------------------------------------
 # MAIN
-folder = '/Users/mightymanh/Desktop/datas/' # this will be folder that contains jpg files and yolo files
+folder = 'C:\\Users\\ChicagoEDT\\github\\team-air-suas-2023\\simulate-images\\snapshots\\target\\' # this will be folder that contains jpg files and yolo files
 maxDistance = 20 # need to figure out what the best maxDistance is
-accuracy = checkAccuracyOfLocalization(folder, maxDistance) 
+accuracy, errorFiles, incorrect = checkAccuracyOfLocalization(folder, maxDistance) 
 print('maxDistance:', maxDistance)
 print('Accuracy: ', accuracy)
 
