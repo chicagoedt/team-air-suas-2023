@@ -61,11 +61,12 @@ def detectLetter(rotations_list):
         print(rotation[1]) # for TESTING # angle
         print(result) # for TESTING # detected text
         if len(result) != 0: # if it detects something from a rotated image
-            if len(result[0][1]) == 1 and ((result[0][1].isalpha() and result[0][1].isupper()) or (result[0][1].isnumeric())) and result[0][2] >= 0.9:
-                return result[0][0], result[0][1], result[0][2], rotation[1]
-                 #    box coordinates,  letter,  confidence level,  angle of rotation
+            if len(result[0][1]) == 1 and (result[0][1].isalpha() or result[0][1].isnumeric()) and result[0][2] >= 0.9:
+                return result[0][0], result[0][1], result[0][2], rotation[1], rotation[0]
+                 #  box coordinates, letter, confidence level, angle of rotation, the preprocessed image
     
-    return () # when all results are bad
+    return rotation[1], rotation[0] # when all results are bad
+            # angle of rotation, preprocessed image
 
 def readImgDetectLetter(img, step):
     rotations_list = listRotations(img, step)
@@ -80,12 +81,14 @@ def readImgPathDetectLetter(img_path, newWidth, step):
     # img preprocessing it, scale it to newWidth
     imgScaled = scaleImg(img, newWidth)
     # blur and gray scale the frame
-    imgBlur = cv2.GaussianBlur(imgScale, (7,7), 1)
+    imgBlur = cv2.GaussianBlur(imgScaled, (7,7), 1)
     imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
 
     # create rotations_list
     results = readImgDetectLetter(imgGray, step)
     return results
+
+
 
     
 
