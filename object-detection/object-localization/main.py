@@ -2,10 +2,10 @@ import cv2
 import ShapeDetector
 
 #for testing, ignore
-hist_h, hist_s, hist_v = ShapeDetector.getHSVHist("img.jpg")
+hist_h, hist_s, hist_v = ShapeDetector.getHSVHist("star.jpg")
 
 # Cv2 setup reading image
-img = cv2.imread("img.jpg")
+img = cv2.imread("star.jpg")
 
 contourImg, coords, pointCount = ShapeDetector.findShape(img)
 print("\nThe coordinate location for the shape is {} and it has {} points.... final answer".format(coords, pointCount))

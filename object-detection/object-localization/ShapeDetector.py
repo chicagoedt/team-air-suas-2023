@@ -20,7 +20,7 @@ def findShape(img):
     # initial image processing for contour prep (black and white image with thresholding applied)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     ret, threshImg = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
-
+    cv2.imshow("Threshhold?", threshImg)
     # Get contours
     contours, _ = cv2.findContours(threshImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     # first 2 values are x and y coordinates and last is the contour count (number of points)
@@ -29,8 +29,9 @@ def findShape(img):
     # opencv detects many contours within the image
     # including the image shape itself (which is index 0 and should be ignored)
     contourCount = 0
-    # if DEBUG: 
-    #     print("Found contours: ", len(contours)) # commented by MANH
+
+    if DEBUG:
+        print("Found contours: ", len(contours)) # commented by MANH
     for contour in contours:
         cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
         approx = cv2.approxPolyDP(contour, 0.01 * cv2.arcLength(contour, True), True)
@@ -45,9 +46,10 @@ def findShape(img):
 
     # Getting the points count that appears the most in the shapeInfo list
     _, _, contourModeCount = max(set(shapeInfo), key=shapeInfo.count)
-    # if DEBUG:
-    #     print("The most occurring shape in this image has {} points".format(contourModeCount)) # commented by MANH
-
+    if DEBUG:
+        print(shapeInfo)
+        print("The most occurring shape in this image has {} points".format(contourModeCount)) # commented by MANH
+    # todo: handle edge case where there is no mode found
     # Getting the average coordinates for the shape with found contourModeCount value
     xSum = 0
     ySum = 0
