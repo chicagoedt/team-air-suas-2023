@@ -29,31 +29,47 @@ def isCoordCorrect( expectedCoord, foundCoord, maxDistance):
         return True
     return False
 
+# check the consistency of jpgs and yolos, assuming they are sorted
+def isConsistentJpgsAndYolos(jpgs_list, yolos_list):
+    if len(jpgs_list) != len(yolos_list): # if two lists do not have same size then they are not consistent
+        print('Inconsistent size: jpgs_list', len(jpgs_list), 'vs yolos_list', len(yolos_list))
+        return False
+    
+    for i in range(len(jpgs_list)):
+        if jpgs_list[i][:15] != yolos_list[i][:15]: # if two files do not correspond to each other 
+            # show where it gets inconsistent
+            print('Inconsistent at index', i, '; jpgs:', jpgs_list[i], 'vs', 'yolos:', yolos_list[i])
+            return False
+    return True
+
+
 # check accuracy of the localization
 # maxDistance is the distance that defines the valid range between foundCoord and expectedCoord
 def checkAccuracyOfLocalization(folder_path, maxDistance):
     # get lists of file
-    files_list = [i for i in os.listdir(folder_path) if not os.path.isdir(i)]
-    files_list.sort() # sort them in order so each jpg file is adjacent to its corresponding yolo file
-    files_list.pop(0) # use this to remove file .pybn_checkpoints
+    jpgs_list = [i for i in os.listdir(folder_path) if (not os.path.isdir(i)) and len(i) == 19]
+    yolos_list = [i for i in os.listdir(folder_path) if (not os.path.isdir(i)) and len(i) == 20]
+    jpgs_list.sort()
+    yolos_list.sort()
 
+    # check if jpgs and yolos in folder_path are consistent
+    if not isConsistentJpgsAndYolos(jpgs_list, yolos_list):
+        print('Jpgs files and yolo files are not consistent. Maybe something is wrong with folder format')
+        return None
+        
     correct = 0
-    totalImages = int(len(files_list) / 2)
+    totalImages = len(jpgs_list)
     errorFiles = [] # image files that ShapeDetector.py fails to process. Useful for optimizing code
     incorrect = [] # image files which ShapeDetector.py fails (isCoordCorrect() == False). Maybe useful for optimizing code
 
     # for every 2 files (image and yolo) check accuracy
-    for i in range(0, len(files_list), 2):
-        img_path = os.path.join(folder_path, files_list[i])
-        yolo_path = os.path.join(folder_path, files_list[i + 1])
-        print('image:', files_list[i], ', yolo:', files_list[i+1])
+    for i in range(0, totalImages):
+        img_path = os.path.join(folder_path, jpgs_list[i])
+        yolo_path = os.path.join(folder_path, yolos_list[i])
+        print('image:', jpgs_list[i], ', yolo:', yolos_list[i])
 
         # get expected Coord
-        try: 
-            expectedCoord = calculateExpectedCoord(img_path, yolo_path)
-        except:
-            print('some ERROR with reading files???? Check if folder contains other files beside jpg and yolo')
-            return None
+        expectedCoord = calculateExpectedCoord(img_path, yolo_path)
 
         # get foundCoord
         try:
@@ -64,28 +80,31 @@ def checkAccuracyOfLocalization(folder_path, maxDistance):
             if isCoordCorrect(expectedCoord, foundCoord, maxDistance):
                 correct += 1
             else:
-                incorrect.append(files_list)    
+                incorrect.append(jpgs_list[i])   # append both incorrect jpgs with its corresponding yolos
+                incorrect.append(yolos_list[i])
         except:
-            errorFiles.append(files_list[i])
+            errorFiles.append(jpgs_list[i])   # append both incorrect jpgs with its corresponding yolos
+            errorFiles.append(yolos_list[i])
             print('some ERROR with ShapeDetector.py') 
             print('-----------------------------------')
             continue
         print('-----------------------------------')
 
-    print(errorFiles)  # uncomment to show all files that ShapeDetector finds trouble to process
-    print(incorrect) # uncomment to show all files that ShapeDetector fails 
-    print('Number of files failed:', len(incorrect))
+    # print(errorFiles)  # uncomment to show all files that ShapeDetector finds trouble to process
+    # print(incorrect) # uncomment to show all files that ShapeDetector fails 
+    print('Number of files failed:', int(len(incorrect) / 2))
     print('Number of errorFiles:', len(errorFiles))
     accuracy = round(correct / (totalImages), 3)
     return accuracy, errorFiles, incorrect
 
-# got copy all files into a folder_path
-def copyFilesToNewFolder(files_list, srcfolder_path, dstfolder_path):
-    for i in range(len(files_list)):
-        img_path = os.path.join(srcfolder_path, files_list[i])
-        yolo_path = os.path.join(folder_path, files_list[i + 1])
+# ignore this, just messing around
+# # got copy all files into a folder_path
+# def copyFilesToNewFolder(files_list, srcfolder_path, dstfolder_path):
+#     for i in range(len(files_list)):
+#         img_path = os.path.join(srcfolder_path, files_list[i])
+#         yolo_path = os.path.join(folder_path, files_list[i + 1])
 
-        # copy files to folder
+#         # copy files to folder
         
     
 
@@ -93,7 +112,7 @@ def copyFilesToNewFolder(files_list, srcfolder_path, dstfolder_path):
 
 #------------------------------------------
 # MAIN
-folder = 'C:\\Users\\ChicagoEDT\\github\\team-air-suas-2023\\simulate-images\\snapshots\\target\\' # this will be folder that contains jpg files and yolo files
+folder = '/Users/mightymanh/Desktop/myCode/myPy/pytorch stuff/team-air-suas-2023-fix-target/simulate-images/snapshots/target/' # this will be folder that contains jpg files and yolo files
 maxDistance = 20 # need to figure out what the best maxDistance is
 accuracy, errorFiles, incorrect = checkAccuracyOfLocalization(folder, maxDistance) 
 print('maxDistance:', maxDistance)

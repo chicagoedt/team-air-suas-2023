@@ -7,6 +7,7 @@ import cv2 # for reading image and processing image
 import easyocr # a pytorch model that detects text and letters
 import imutils # for rotating image
 import time # for TESTING
+from text_specialcase import *
 
 def scaleImg(img, newWidth): 
     '''
@@ -39,7 +40,7 @@ def listRotations(img, step):
         rotations_list.append((rotatedImg, i))
     return rotations_list 
 
-def detectLetter(rotations_list):
+def detectLetter(rotations_list, reader):
     '''
     list -> tuple
 
@@ -53,28 +54,44 @@ def detectLetter(rotations_list):
         - angle of rotation (int)
     Returns empty tuple if there is no good result
     '''
-    reader = easyocr.Reader(['en']) # 'en' stands for reading in english. easyocr can read many languages like chinese, spanish,... but we care only english
-    
+ 
     # pass all rotated versions to model and get results
     for rotation in rotations_list: 
         result = reader.readtext(rotation[0])
-        print(rotation[1]) # for TESTING # angle
-        print(result) # for TESTING # detected text
+        # print(rotation[1]) # for TESTING # angle
+        # print(result) # for TESTING # detected text
         if len(result) != 0: # if it detects something from a rotated image
             if len(result[0][1]) == 1 and (result[0][1].isalpha() or result[0][1].isnumeric()) and result[0][2] >= 0.9:
-                return result[0][0], result[0][1], result[0][2], rotation[1], rotation[0]
+                return [result[0][0], result[0][1], result[0][2], rotation[1], rotation[0]]   #TESTING: JUST REPLACE TUPLE WITH LIST
                  #  box coordinates, letter, confidence level, angle of rotation, the preprocessed image
     
-    return rotation[1], rotation[0] # when all results are bad
+    return [rotation[1], rotation[0]] # when all results are bad
             # angle of rotation, preprocessed image
 
-def readImgDetectLetter(img, step):
+
+# detect letter in img
+def readImgDetectLetter(img, step, reader):
+    '''
+    Matrix, int, easyocr.Reader -> list
+    '''
     rotations_list = listRotations(img, step)
-    results = detectLetter(rotations_list)
-    print(results)
+    results = detectLetter(rotations_list, reader)
+    # print(results)
     return results
 
-def readImgPathDetectLetter(img_path, newWidth, step):
+# get all possibilities from result. e.g: if easyocr detects its an N, the letter could be N or Z
+def resultsToPossibility(results):
+    '''
+    list -> list
+    '''
+    return specialCase(results[1])
+
+# detect letter in img
+def readImgPathDetectLetter(img_path, newWidth, step, reader):
+    '''
+    str, int, int, easyocr.Reader -> list
+    '''
+    startTime = time.time()
     # read img
     img = cv2.imread(img_path)
 
@@ -85,15 +102,9 @@ def readImgPathDetectLetter(img_path, newWidth, step):
     imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
 
     # create rotations_list
-    results = readImgDetectLetter(imgGray, step)
+    results = readImgDetectLetter(imgGray, step, reader)
+    print('Time:', time.time() - startTime)
     return results
-
-
-
-    
-
-    
-
 
 
 
