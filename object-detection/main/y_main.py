@@ -3,8 +3,8 @@
 '''
 
 # import sths
-from localization_crop import *
-from text_letterImageMapping import *
+from crop import *
+from letterImageMapping import *
 
 ImagesByCamera_Folder = 'ImagesByCamera'
 CroppedImages_Folder = 'CroppedImages' 
