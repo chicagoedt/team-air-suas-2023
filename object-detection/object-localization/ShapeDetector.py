@@ -33,7 +33,7 @@ def findShape(img):
     if DEBUG:
         print("Found contours: ", len(contours)) # commented by MANH
     for contour in contours:
-        cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
+        #cv2.drawContours(img, [contour], 0, (0, 0, 255), 5) # commented by MANH to unable drawing contours
         approx = cv2.approxPolyDP(contour, 0.01 * cv2.arcLength(contour, True), True)
         M = cv2.moments(contour)
         if M['m00'] != 0.0:
@@ -63,4 +63,5 @@ def findShape(img):
     avgCoords = (int(xSum / i), int(ySum / i))
     cv2.circle(img, avgCoords, radius=1, color= (255,0,0), thickness=1)
     if DEBUG: print("Average coordinate location: ", avgCoords)
+    print('exit ShapeDetector')
     return img, avgCoords, contourModeCount

@@ -13,5 +13,3 @@ cv2.imshow("contours", contourImg)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-
-

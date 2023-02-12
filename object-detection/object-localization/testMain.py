@@ -113,7 +113,7 @@ def checkAccuracyOfLocalization(folder_path, maxDistance):
 #------------------------------------------
 # MAIN
 folder = '/Users/mightymanh/Desktop/myCode/myPy/pytorch stuff/team-air-suas-2023-fix-target/simulate-images/snapshots/target/' # this will be folder that contains jpg files and yolo files
-maxDistance = 20 # need to figure out what the best maxDistance is
+maxDistance = 40 # need to figure out what the best maxDistance is
 accuracy, errorFiles, incorrect = checkAccuracyOfLocalization(folder, maxDistance) 
 print('maxDistance:', maxDistance)
 print('Accuracy: ', accuracy)
