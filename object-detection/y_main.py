@@ -10,7 +10,7 @@ letters = inputsFromJudge.split()
 
 # object localization, crop
 cropFolder(ImagesByCamera_Folder, CroppedImages_Folder, 100, 100)
-print('------------------------------')
+print('#################################')
 
 # text detection, mapping letters to each images
 imageNames_list = os.listdir(CroppedImages_Folder)

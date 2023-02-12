@@ -1,7 +1,10 @@
 import sys
+import os
 
-objectLocalization_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023/object-detection/object-localization'
-textDetection_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023/object-detection/text-detection'
+currentDirectory = os.getcwd()
+
+objectLocalization_path = os.path.join(currentDirectory, 'object-localization')
+textDetection_path = os.path.join(currentDirectory, 'text-detection')
 
 # import crop from object-localization folder
 sys.path.append(objectLocalization_path)
