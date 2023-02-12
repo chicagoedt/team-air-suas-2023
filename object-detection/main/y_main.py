@@ -1,10 +1,4 @@
-'''
-    
-'''
-
-# import sths
-from crop import *
-from letterImageMapping import *
+from modules import *
 
 ImagesByCamera_Folder = 'ImagesByCamera'
 CroppedImages_Folder = 'CroppedImages' 
@@ -19,4 +13,5 @@ cropFolder(ImagesByCamera_Folder, CroppedImages_Folder, 100, 100)
 print('------------------------------')
 
 # text detection, mapping letters to each images
-results = mapLettersToImages(letters, CroppedImages_Folder)
+imageNames_list = os.listdir(CroppedImages_Folder)
+results = mapLettersToImages(letters, imageNames_list, CroppedImages_Folder, 400, 20)
