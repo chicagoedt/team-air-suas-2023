@@ -6,6 +6,7 @@ from PIL import Image
 from shapely import affinity
 
 import vars
+from sim_image import *
 from target import *
 from snapshot import *
 
@@ -133,20 +134,20 @@ def placeTarget(image, filename, t1=None):
 # write the yolo file containing the location of the target on the image
 def writeYolo(polygon):
     xMin, yMin, xMax, yMax = [int(b) for b in polygon.bounds]
-    targetWidth = xMax - xMin
-    targetHeight = yMax - yMin
+    width = xMax - xMin
+    height = yMax - yMin
 
     # find centerpoint of target
-    targetCenter = [int(c) for c in polygon.centroid.coords[0]]
-    # print("  center:", targetCenter)
+    center = [int(c) for c in polygon.centroid.coords[0]]
+    # print("  center:", center)
 
     # write yolo file in this format:
     #   0 <bbox center x> <bbox center y> <bbox width> <bbox height>
     yolo = [
-        targetCenter[0] / vars.imageSizePx[0],
-        targetCenter[1] / vars.imageSizePx[1],
-        targetWidth / vars.imageSizePx[0],
-        targetHeight / vars.imageSizePx[1]
+        center[0] / vars.imageSizePx[0],
+        center[1] / vars.imageSizePx[1],
+        width / vars.imageSizePx[0],
+        height / vars.imageSizePx[1]
     ]  # divide by image dimensions to scale to 1
 
     yoloString = "0 " + " ".join([f"{y:.8f}" for y in yolo])
