@@ -4,10 +4,12 @@ from shapely.geometry.polygon import Polygon
 from shapely.geometry import box
 
 # directories
-noTargetDir = "snapshots/no-target/"
+noTargetDir = "snapshots/no_target/"
 targetDir = "snapshots/target/"
-resourceDir = "target-resources/"
-targetInfoPath = "snapshots/target-info.csv"
+targetPracticeDir = "snapshots/target_practice/"
+resourceDir = "target_resources/"
+targetInfoPath = "snapshots/target_info.csv"
+targetPracticeInfoPath = "snapshots/target_practice_info.csv"
 
 # constants
 sensorSize = 7.9  # mm
