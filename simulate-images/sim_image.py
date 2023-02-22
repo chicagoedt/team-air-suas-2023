@@ -190,6 +190,11 @@ class SimImage:
         self.snapshot.convert("RGB") \
             .save(os.path.join(location, self.filename + ".jpg"))
 
+        with open(vars.targetPracticeInfoPath, "a") as info:
+            for t in self.targets:
+                seed = [str(i) for i in t["seed"].values()][1:]
+                info.write(f"{self.filename},{','.join(seed)}\n")
+
     def cropSnapshot(self):
         if len(self.targets) != 1:
             print("error: len(targets) != 1")

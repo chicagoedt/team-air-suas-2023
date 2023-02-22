@@ -44,6 +44,17 @@ def main():
         os.makedirs(vars.noTargetDir)
         generateEmptyImages(runway)
 
+    # check if target practice directory exists
+    if os.path.exists(vars.targetPracticeDir):
+        rmtree(vars.targetPracticeDir)
+    os.makedirs(vars.targetPracticeDir)
+
+    # remove target_practice_info.csv if it exists
+    if os.path.exists(vars.targetPracticeInfoPath):
+        os.remove(vars.targetPracticeInfoPath)
+    with open(vars.targetPracticeInfoPath, "w") as info:
+        info.write("filename,shape,shapeColor,letter,letterColor\n")
+
     for filename in os.listdir(vars.noTargetDir):
         print(f"Simulating targets for {filename}")
         with Image.open(os.path.join(vars.noTargetDir, filename)) as snapshot:
