@@ -14,7 +14,7 @@ def main():
     os.chdir(os.path.dirname(__file__))
 
     # open runway image
-    runway = Image.open("reference-images/runway.png")
+    runway = Image.open("reference_images/runway.png")
 
     # check if empty images have already been generated
     generateNew = True
