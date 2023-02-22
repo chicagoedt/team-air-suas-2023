@@ -6,7 +6,6 @@ from PIL import Image
 from shapely import affinity
 
 import vars
-from sim_image import *
 from target import *
 from snapshot import *
 
@@ -75,7 +74,7 @@ def generateTargetImages(num):
     if os.path.exists(vars.targetDir):
         rmtree(vars.targetDir)
     os.makedirs(vars.targetDir)
-    
+
     # remove target-info.csv if it exists
     if os.path.exists(vars.targetInfoPath):
         os.remove(vars.targetInfoPath)
@@ -86,17 +85,17 @@ def generateTargetImages(num):
     for filename in os.listdir(vars.noTargetDir):
         print(f"Simulating targets for {filename}")
         with Image.open(os.path.join(vars.noTargetDir, filename)) as emptyImage:
+            emptyImage = emptyImage.convert("RGBA")
             for i in range(num):
-                with emptyImage as simImage:
-                    simImage = simImage.convert("RGBA")
-                    simFilename = filename[:-4] + f"_tar_{i:03}"
+                targetImage = emptyImage
+                targetFilename = filename[:-4] + f"_tar_{i:03}"
 
-                    t1 = placeTarget(simImage, simFilename)
-                    t2 = placeTarget(simImage, simFilename, t1)
+                t1 = placeTarget(targetImage, targetFilename)
+                t2 = placeTarget(targetImage, targetFilename, t1)
 
-                    # save image
-                    simImage = simImage.convert("RGB")
-                    simImage.save(os.path.join(vars.targetDir, simFilename + ".jpg"))
+                # save image
+                targetImage = targetImage.convert("RGB")
+                targetImage.save(os.path.join(vars.targetDir, targetFilename + ".jpg"))
 
 
 # create and place a target on the empty image
@@ -106,8 +105,8 @@ def placeTarget(image, filename, t1=None):
     targetPolygon = moveTarget(targetPolygon, t1)
 
     # DEBUG: check if a second target was placed
-    if t1 != None:
-        if targetPolygon == None:
+    if t1 is not None:
+        if targetPolygon is None:
             return None
         else:
             print(f"  {filename} has 2 targets")
