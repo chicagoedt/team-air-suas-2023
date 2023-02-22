@@ -6,6 +6,8 @@ from PIL import Image, ImageDraw, ImageFont
 from shapely import affinity
 from shapely.geometry import box
 
+import vars
+
 
 # constants
 SHAPES = (
@@ -31,6 +33,24 @@ COLORS = {
 }
 
 
+# move polygon to a random location within image bounds
+def moveTarget(polygon):
+    xMin, yMin, xMax, yMax = [int(b) for b in polygon.bounds]
+    width = xMax - xMin
+    height = yMax - yMin
+
+    # choose random location
+    offset = [
+        randint(0, vars.imageSizePx[0] - width),
+        randint(0, vars.imageSizePx[1] - height),
+    ]  # upper left corner of target
+
+    # move to location
+    polygon = affinity.translate(polygon, xoff=offset[0], yoff=offset[1])
+
+    return polygon
+
+
 # choose a color from colors, excluding if necessary
 def chooseColor(exclude=None):
     validColors = list(COLORS.keys())
@@ -52,20 +72,23 @@ def generateSeed(params=None) -> dict:
 
     if params:
         for k, v in params.items():
-            seed[k] = v
+            if k == "rotate":
+                seed["rotation"] = None if v else 0
+            else:
+                seed[k] = None if v == "random" else v
 
-    if not seed["rotation"]:
+    if seed["rotation"] is None:
         seed["rotation"] = randint(0, 359)
 
     seed["shape"] = SHAPES[randint(0, 12)]
 
-    if not seed["shapeColor"]:
+    if seed["shapeColor"] is None:
         seed["shapeColor"] = chooseColor(exclude=seed.get("letterColor"))
 
-    if not seed["letter"]:
+    if seed["letter"] is None:
         seed["letter"] = chr(randint(65, 90))
 
-    if not seed["letterColor"]:
+    if seed["letterColor"] is None:
         seed["letterColor"] = chooseColor(exclude=seed.get("shapeColor"))
 
     return seed
@@ -117,19 +140,27 @@ class SimImage:
         self.filename = f
         self.targets = []
 
+    def setTargetParams(self, rot, shpColor, ltr, ltrColor):
+        self.seed = {
+            "rotate": rot,
+            "shapeColor": shpColor,
+            "letter": ltr,
+            "letterColor": ltrColor
+        }
+
     def createTarget(self, **kwargs):
-        seed = generateSeed(kwargs)
+        seed = generateSeed(self.seed)
 
         # create a new image, draw shape and letter
-        target = Image.new(mode="RGBA", size=vars.targetSize, color="#0000")
-        target = drawShape(target, seed["shape"], seed["shapeColor"])
-        target = drawLetter(target, seed["letter"], seed["letterColor"])
+        image = Image.new(mode="RGBA", size=vars.targetSize, color="#0000")
+        image = drawShape(image, seed["shape"], seed["shapeColor"])
+        image = drawLetter(image, seed["letter"], seed["letterColor"])
 
         # create a polygon for the target
-        polygon = box(0, 0, target.size[0], target.size[1])
+        polygon = box(0, 0, image.size[0], image.size[1])
 
-        # rotate the target
-        target = target.rotate(
+        # rotate the image
+        image = image.rotate(
             seed["rotation"],
             expand=True,
             fillcolor="#0000"
@@ -144,18 +175,39 @@ class SimImage:
         )  # snap to axes
 
         self.targets.append({
-            "target": target,
+            "image": image,
             "polygon": polygon,
             "seed": seed,
         })
 
-    def saveImage(self):
+    # returns a new Image of target placed on self.snapshot
+    def placeTarget(self, i):
+        t = self.targets[i]
+        xMin, yMin, xMax, yMax = [int(b) for b in t["polygon"].bounds]
+        self.snapshot.alpha_composite(t["image"], dest=(xMin, yMin))
+
+    def saveSnapshot(self, location):
         self.snapshot.convert("RGB") \
-            .save(os.path.join(vars.targetDir, self.filename + ".jpg"))
+            .save(os.path.join(location, self.filename + ".jpg"))
+
+    def cropSnapshot(self):
+        if len(self.targets) != 1:
+            print("error: len(targets) != 1")
+
+        xMin, yMin, xMax, yMax = [int(b) for b in self.targets[0]["polygon"].bounds]
+        self.snapshot = self.snapshot.crop((xMin - 15, yMin - 15, xMax + 15, yMax + 15))
+
+    def practiceTarget(self):
+        self.createTarget()
+        self.targets[0]["polygon"] = moveTarget(self.targets[0]["polygon"])
+        self.placeTarget(0)
+        self.cropSnapshot()
+        self.saveSnapshot(vars.targetPracticeDir)
 
 
 if __name__ == "__main__":
-    s = SimImage()
-    s.createTarget()
-    s.createTarget(shapeColor="red", letter="4")
-    print(s.targets)
+    for i in range(10):
+        with Image.open(os.path.join(vars.noTargetDir, "img_000.jpg")) as s:
+            s = s.convert("RGBA")
+            simulate = SimImage(s, f"img_000_tar_00{i}")
+            simulate.practiceTarget()
