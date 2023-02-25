@@ -1,70 +1,86 @@
 '''
-    Some special cases that easyocr has to deal with
-    
+    some special case that help narrow the result_list
 '''
 
+def narrowResultList(result_list):
+    letter1_list = [i[1] for i in result_list]
+    letter_list = list(set(letter1_list))
+    if 'E' in letter_list:
+        return ['E']
+    if ('8' in letter_list and 'S' not in letter_list) or 'B' in letter_list:
+        return ['B']
+    if 'R' in letter_list:
+        return ['R']
+    if 'S' in letter_list:
+        return['S']
+    if 'X' in letter_list and ('H' not in letter_list or 'I' not in letter_list):
+        if 'K' in letter_list:
+            return ['K', 'X']
+        else:
+            return['X']
+    if 'D' in letter_list:
+        return ['D']
+    if 'J' in letter_list:
+        return ['J']
+    if 'F' in letter_list:
+        if 'T' not in letter_list:
+            return ['F']
+        else:
+            return ['F', 'T']
+    if 'G' in letter_list:
+        return ['G']
+    if 'd' in letter_list or 'p' in letter_list or 'P' in letter_list:
+        return ['P']
+    if ('K' in letter_list or 'k' in letter_list) and ('H' not in letter_list or 'I' not in letter_list) and ('T' not in letter_list):
+        if 'X' not in letter_list:
+            return['K']
+        else:
+            return ['K', 'X']
+    
+    if 'Y' in letter_list: # unsure
+        if 'T' not in letter_list:
+            return['Y']
+        else:
+            return ['Y', 'T']
 
-# the result is any of the following letters Z, N, z, 2 then it should be Z or N
-caseZ_N_z = ['Z', 'N']
-
-# the result is 0 then it could be Q, O, B, D
-case0 = ['O', 'Q', 'B', 'D', 'C']
-
-# the result is H or I, then it must be H
-caseH_I = ['H'] 
-
-# the result is 3, m then it must be E  
-case3_m = ['E']
-
-# the result is A or 4, then it must be A
-caseA_4 = ['A']
-
-# the result is V then it could be A or V 
-caseV = ['A', 'V']
-
-# the result is M, E, W, then it should be one of following M, E, or W
-caseM_E_W = ['M', 'E', 'W']
-
-# the result is p, d, P, then it must be P
-caseP_p_d = ['P']
-
-# the result is S, 9, 6, s then it must be S
-caseS_9_6_s = ['S']
-
-# the result is F, L, 7 then it could be F or L
-caseF_L_7 = ['F', 'L']
-
-# the result is 8, then it must be B
-case8_B = ['B']
-
-
-def specialCase(detectedLetter):
-    if detectedLetter in ['Z', 'N', 'z', '2']:
-        return caseZ_N_z
-    elif detectedLetter in ['0']:
-        return case0
-    elif detectedLetter in ['H', 'I']:
-        return caseH_I
-    elif detectedLetter in ['3', 'm']:
-        return case3_m
-    elif detectedLetter in ['A', '4']:
-        return caseA_4
-    elif detectedLetter in ['V']:
-        return caseV
-    elif detectedLetter in ['M', 'E', 'W', 'm']:
-        return caseM_E_W
-    elif detectedLetter in ['P', 'd', 'p']:
-        return caseP_p_d
-    elif detectedLetter in ['S', '9', '6', 's']:
-        return caseS_9_6_s
-    elif detectedLetter in ['F', 'L', '7']:
-        return caseF_L_7
-    elif detectedLetter in ['8', 'B']:
-        return case8_B
-    else:
-        return [detectedLetter]
+    if 'T' in letter_list:
+        return ['T']
+    if 'C' in letter_list:  #unsure
+        if 'U' in letter_list:
+            return ['U']
+        elif 'S' in letter_list:
+            return ['S']
+        else:
+            return ['C']
+    if 'U' in letter_list:
+        return ['U']
+    if 'V' in letter_list or 'A' in letter_list:
+        if ((letter1_list.count('N') / len(letter1_list)) <= 1/3): # if N is minority then it cannot be N
+            if '4' in letter_list:
+                return ['A']
+            else:
+                return ['A', 'V', 'L', '7']
+    if 'H' in letter_list or 'I' in letter_list:
+        return ['H']
+    if 'M' in letter_list or 'W' in letter_list:
+        return ['M', 'W']
+    if 'N' in letter_list or 'Z' in letter_list:
+        if ((letter1_list.count('V') / len(letter1_list)) <= 1/3): # if V is minority then it cannot be V
+            return ['N', 'Z']
+    if '0' in letter_list:   #unsure
+        if 'Q' in letter_list:
+            return ['Q']
+        elif 'U' in letter_list:
+            return ['U']
+        else:
+            return['O', '0', 'Q']
+    
+    # when all cases are failed
+    return letter_list
+    
+        
+    
 
 
-
-
-
+    
+    

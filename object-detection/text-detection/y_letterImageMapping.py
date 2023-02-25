@@ -1,4 +1,5 @@
 from y_TextDetection import *  # text detection
+from y_specialcase import *    # text detection
 import os                      # listdir, pathjoin 
 import itertools               # permutation
 
@@ -7,7 +8,7 @@ def calScore(letters, possibilities_list):
     score = 0
     numImages = len(possibilities_list)
     for i in range(numImages):
-        if possibilities_list[i] != None:
+        if len(possibilities_list[i]) != 0:
             if letters[i] in possibilities_list[i]:
                 score += 1
     return score
@@ -42,17 +43,12 @@ def mapLettersToImages(letters, imageNames_list, root, newWidth, step):
     for imageName in imageNames_list:
         print(imageName)
         image_path = os.path.join(root, imageName)
-        results = readImgPathDetectLetter(image_path, newWidth, step, reader)
-        if len(results) == 2: # if it does not detect anything
-            possibility = None
-            if DEBUG:
-                print('Possibility:', possibility)
-        else:
-            possibility = resultsToPossibility(results)
-            if DEBUG: 
-                print('result:', results[1])
-                print('Possibility:', possibility)
-        possibilities_list.append(possibility)
+        result_list = readImgPathDetectLetter(image_path, newWidth, step, reader)
+        narrow_list = narrowResultList(result_list)
+        result_list = [i[1] for i in result_list]
+        print('result_list:', result_list)
+        print('narrow_list:', narrow_list)
+        possibilities_list.append(narrow_list)
         if DEBUG: print('----------------------------')
     
     # map letters to images  

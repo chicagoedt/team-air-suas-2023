@@ -5,6 +5,7 @@ from PIL import Image                 # pdf generator
 import itertools                      # permutation
 import random                         # shuffleList
 import statistics                     # mean, median, stdDev
+from y_specialcase import *
 
 ''' ----- helper function for getAccuracyOfTextDetection() ----- '''
 # stack orignal and result image (these imgs are read by cv2)
@@ -54,11 +55,8 @@ def shuffleList(sth_list):
 
 ''' ----- end of helper function for getAccuracyOfLettersImagesMapping() ----- '''
 
-# test accuracy of the model by iterating all files in the folder
-# get the pdf file containing comparison
-def getAccuracyOfTextDetection(folder_path, newWidth, step, letter, numIter):
 
-    DEBUG = True # set DEBUG to True to generate pdf file
+def getAccuracyOfTextDetection(folder_path, newWidth, step, letter, numIter):
     reader = easyocr.Reader(['en'])
 
     # set up list of target filenames and list of answers list
@@ -69,57 +67,38 @@ def getAccuracyOfTextDetection(folder_path, newWidth, step, letter, numIter):
     randomImageNames.sort()
     answers_list = [i[-5] for i in imageNames_list]
 
-    # set up list for PDF generation
-    imgPil_list = [] # lists that contains images that will be loaded to pdf
-    incorrectTargets = []
+    # loop
     correct = 0
-    
-    # for each target in targets_list
+    cannotDetect = 0
+    wrong = 0
     for i in range(numIter):
         print(i, '> Processing: ', randomImageNames[i])
-        target_path = os.path.join(folder_path, randomImageNames[i])
-
-        # pass target to text detection model, follow step by step: read, img preprocessing, pass it to model to get output, and compare two results
-        results = readImgPathDetectLetter(target_path, newWidth, step, reader)
-        if len(results) == 2:
+        img_path = os.path.join(folder_path, randomImageNames[i])
+        result_list = readImgPathDetectLetter(img_path, newWidth, step, reader)
+        narrow_list = narrowResultList(result_list)
+        result_list = [j[1] for j in result_list]
+        print('result_list:', result_list)
+        print('narrow_list:', narrow_list)
+        if len(narrow_list) == 0:
             print('Cannot detect anything')
-            incorrectTargets.append(randomImageNames[i])
+            cannotDetect += 1
         else:
-            possibility = resultsToPossibility(results)
-            print('result:', results[1])
-            print('possibilities:', possibility)
-            if answers_list[i] in possibility:
-                print('Correct!')
+            if answers_list[i] in narrow_list:
+                print('correct!')
                 correct += 1
             else:
                 print('Wrong :(')
-                incorrectTargets.append(randomImageNames[i])
-    
-        if DEBUG:
-            # build scaled img
-            img = cv2.imread(target_path)
-            imgScaled = scaleImg(img, newWidth)
-
-            # get imgStack and convert it to PIL image
-            imgStack = stackHorizontal(randomImageNames[i], imgScaled, results, possibility)
-            imgStackPil = Image.fromarray(imgStack)
-            imgPil_list.append(imgStackPil)
-
+                wrong += 1
         print('-----------------------------------')
 
-    if DEBUG:
-        # load pil images to pdf
-        print('Loading pdf file: ....')
-        namePDF = letter + '.pdf'
-        imgPil_list[0].save(namePDF, save_all = True, append_images = imgPil_list[1:])
-
     # print resutls 
-    accuracy = round(correct / numIter, 3)
-    print('Accuracy:', accuracy)
-    print('Num files incorrect:', len(incorrectTargets))
+    print('##########  Result ########################')
+    print('Correct: {}/{}'.format(correct, numIter))
+    print('Wrong: {}/{}'.format(wrong, numIter))
+    print('Cannot Detect: {}/{}'.format(cannotDetect, numIter))
+    return correct, wrong, cannotDetect
 
-    return accuracy
-
+    
 
 # get accuracy of function mapping letters and images
 def getAccuracyOfLettersImagesMapping(folder_path, newWidth, step, numIter):
