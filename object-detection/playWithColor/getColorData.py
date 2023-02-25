@@ -20,13 +20,13 @@ def click_event(event, x, y, flags, params):
         cv2.imshow('image', img)
 
 # path to image
-folder_path = '/Users/mightymanh/Desktop/myCode/myPy/pytorch stuff/team-air-suas-2023-fix-target/simulate-images/snapshots/target/'
-filename = 'img_000_tar_037_P.jpg'
+folder_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023-fix-target/simulate-images/snapshots/target'
+filename = 'img_007_tar_136_F.jpg'
 filePath = os.path.join(folder_path, filename)
-
+# filePath = '/Users/mightymanh/Desktop/HSVrange.png'
 # read img and scale it to big enough size
 img = cv2.imread(filePath)
-img = cv2.resize(img, (300, 300))
+img = cv2.resize(img, (500, 500))
 cv2.imshow('image', img)
 
 # setting mouse handler for the image

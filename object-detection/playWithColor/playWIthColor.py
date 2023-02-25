@@ -1,41 +1,49 @@
 '''
-    extract red from image
+    extract color from image
 '''
 # Task: find the range for red
 import os
 import cv2
 import numpy as np
+from y_colorFunc import *
 
-folder_path = '/Users/mightymanh/Desktop/myCode/myPy/pytorch stuff/team-air-suas-2023-fix-target/simulate-images/snapshots/target/'
-filename = 'img_000_tar_028_I.jpg'
+def extractMask(img, lower_array, upper_array):
+    lenArray = len(lower_array)
+    mask_array = []
+    for i in range(lenArray):
+        mask = cv2.inRange(img, lower_array[i], upper_array[i])
+        mask_array.append(mask)
+    maskTotal = np.zeros((img.shape[0], img.shape[1]), dtype = np.uint8)
+    for mask in mask_array:
+        maskTotal = cv2.bitwise_or(maskTotal, mask)
+    return maskTotal
+
+
+folder_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023-fix-target/simulate-images/snapshots/target'
+filename = 'img_007_tar_136_F.jpg'
 
 # path to image
+# file_path = '/Users/mightymanh/Desktop/HSVrange.png'
 file_path = os.path.join(folder_path, filename)
 img = cv2.imread(file_path)
 
 # scale target so it's big enough
-imgScaled = cv2.resize(img, (300, 300))
-imgScaled = cv2.cvtColor(imgScaled, cv2.COLOR_BGR2HSV)
+imgScaled = img #cv2.resize(img, (300, 300))
+imgScaledHSV = cv2.cvtColor(imgScaled, cv2.COLOR_BGR2HSV)
 
-# hsv bounds for red
-lower1 = np.array([0, 187, 152])
-upper1 = np.array([5, 255, 255])
-lower2 = np.array([157, 187, 152])
-upper2 = np.array([179, 255, 255])
+# hsv bounds for color
+lower_array = [lower_orange1, lower_orange2, lower_orange3, lower_orange4, lower_orange5, lower_orange6]
+upper_array = [upper_orange1, upper_orange2, upper_orange3, upper_orange4, upper_orange5, upper_orange6]
 
-# extract red from imgScaled
-mask = cv2.inRange(imgScaled, lower1, upper1)
-mask2 = cv2.inRange(imgScaled, lower2, upper2)
-result = cv2.bitwise_or(mask, mask2)
 
-# show photos 
+# extract color from imgScaled
+maskTotal = extractMask(imgScaledHSV, lower_array, upper_array)
+result = cv2.bitwise_and(imgScaled, imgScaled, mask = maskTotal)
+cv2.imwrite('/Users/mightymanh/Desktop/mask.jpg', maskTotal)
+
+# show images
 cv2.imshow('Scaled', imgScaled)
-cv2.imshow('mask', mask)
-cv2.imshow('mask2', mask2)
+cv2.imshow('mask', maskTotal)
 cv2.imshow('result', result)
-cv2.setWindowProperty('Scaled', cv2.WND_PROP_TOPMOST, 1)
-cv2.setWindowProperty('mask', cv2.WND_PROP_TOPMOST, 1)
-cv2.setWindowProperty('mask2', cv2.WND_PROP_TOPMOST, 1)
-cv2.setWindowProperty('result', cv2.WND_PROP_TOPMOST, 1)
 cv2.waitKey(0)
 
