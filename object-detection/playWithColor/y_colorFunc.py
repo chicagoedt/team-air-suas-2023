@@ -1,3 +1,7 @@
+'''
+    given a pixel with known hsv value, determine color
+'''
+
 from y_color import *
 
 # check if hsv is in range input lower and input upper
@@ -23,12 +27,15 @@ def hsvInRangeArray(hsv, lower_array, upper_array):
 # get the color name that best match with input hsv
 def getColorOfPixel(hsv):
     # white
+    if hsvInRangeArray(hsv, lowerWhite_array, upperWhite_array):
+        return 'White'
     
     # black
     if hsvInRangeArray(hsv, lowerBlack_array, upperBlack_array):
         return 'Black'
     
-    # gray
+    # gray 
+        #ignore this guy
 
     # red
     if hsvInRangeArray(hsv, lowerRed_array, upperRed_array):
@@ -51,6 +58,8 @@ def getColorOfPixel(hsv):
         return 'Purple'
 
     # brown
+    if hsvInRangeArray(hsv, lowerBrown_array, upperBrown_array):
+        return 'Brown'
 
     # orange
     if hsvInRangeArray(hsv, lowerOrange_array, upperOrange_array):

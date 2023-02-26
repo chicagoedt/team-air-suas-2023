@@ -1,7 +1,11 @@
+'''
+    some preprocessing image functions
+'''
+
 import cv2
 import os
 
-
+# scale image from W * H -> newWidth * (H * newWidth / W)
 def scaleImg(img, newWidth): 
     size = img.shape # a tuple (side1, side2, rgb)
     width = min(size[0], size[1]) # find which side is width (the smaller side)
@@ -9,6 +13,7 @@ def scaleImg(img, newWidth):
     scaled_img = cv2.resize(img, new_size) # scale to new_size
     return scaled_img 
 
+# crop image to rectangle whose center = image center and has input width and input height
 def cropImage(img, width, height):
     centerCoords = (int(img.shape[1] / 2), int(img.shape[0] / 2))
     

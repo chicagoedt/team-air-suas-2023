@@ -1,12 +1,12 @@
 import cv2
 import numpy as np
 
-lower = [4, 150, 150]
-upper = [6, 179, 255]
+lower = [13, 60, 40]
+upper = [17, 149, 149]
 
-for h in range(lower[0], upper[0] + 1):
-    for s in range(lower[1], upper[1] + 1, 10):
-        for v in range(lower[2], upper[2] + 1, 10):
+for h in range(lower[0], upper[0] + 1, 1):
+    for s in range(lower[1], upper[1] + 1, 20):
+        for v in range(lower[2], upper[2] + 1, 20):
             color = np.array([h, s, v])
             colors = np.zeros((400, 400, 3), dtype = np.uint8)
             height = len(colors)

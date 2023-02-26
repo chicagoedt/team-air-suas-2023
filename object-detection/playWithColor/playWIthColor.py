@@ -7,20 +7,19 @@ import cv2
 import numpy as np
 from y_colorFunc import *
 
-def extractMask(img, lower_array, upper_array):
+def extractMask(imgHSV, lower_array, upper_array):
     lenArray = len(lower_array)
     mask_array = []
     for i in range(lenArray):
-        mask = cv2.inRange(img, lower_array[i], upper_array[i])
+        mask = cv2.inRange(imgHSV, lower_array[i], upper_array[i])
         mask_array.append(mask)
-    maskTotal = np.zeros((img.shape[0], img.shape[1]), dtype = np.uint8)
+    maskTotal = np.zeros((imgHSV.shape[0], imgHSV.shape[1]), dtype = np.uint8)
     for mask in mask_array:
         maskTotal = cv2.bitwise_or(maskTotal, mask)
     return maskTotal
 
-
 folder_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023-fix-target/simulate-images/snapshots/target'
-filename = 'img_007_tar_136_F.jpg'
+filename = 'img_017_tar_025_M.jpg'
 
 # path to image
 # file_path = '/Users/mightymanh/Desktop/HSVrange.png'
@@ -32,8 +31,8 @@ imgScaled = img #cv2.resize(img, (300, 300))
 imgScaledHSV = cv2.cvtColor(imgScaled, cv2.COLOR_BGR2HSV)
 
 # hsv bounds for color
-lower_array = [lower_orange1, lower_orange2, lower_orange3, lower_orange4, lower_orange5, lower_orange6]
-upper_array = [upper_orange1, upper_orange2, upper_orange3, upper_orange4, upper_orange5, upper_orange6]
+lower_array = lowerBlack_array
+upper_array = upperBlack_array
 
 
 # extract color from imgScaled

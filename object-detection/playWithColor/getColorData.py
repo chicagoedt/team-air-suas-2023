@@ -21,7 +21,7 @@ def click_event(event, x, y, flags, params):
 
 # path to image
 folder_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023-fix-target/simulate-images/snapshots/target'
-filename = 'img_007_tar_136_F.jpg'
+filename = 'img_017_tar_025_M.jpg'
 filePath = os.path.join(folder_path, filename)
 # filePath = '/Users/mightymanh/Desktop/HSVrange.png'
 # read img and scale it to big enough size
