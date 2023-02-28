@@ -32,6 +32,8 @@ COLORS = {
     "brown": (72, 59, 39),  # Brown
 }
 
+CHARACTERS = (*list(range(48, 58)), *list(range(65, 91)))
+
 
 # move polygon to a random location within image bounds
 def moveTarget(polygon):
@@ -86,7 +88,7 @@ def generateSeed(params=None) -> dict:
         seed["shapeColor"] = chooseColor(exclude=seed.get("letterColor"))
 
     if seed["letter"] is None:
-        seed["letter"] = chr(randint(65, 90))
+        seed["letter"] = chr(CHARACTERS[randint(0, len(CHARACTERS) - 1)])
 
     if seed["letterColor"] is None:
         seed["letterColor"] = chooseColor(exclude=seed.get("shapeColor"))
@@ -211,8 +213,14 @@ class SimImage:
 
 
 if __name__ == "__main__":
+    # small test of target practice
     for i in range(10):
         with Image.open(os.path.join(vars.noTargetDir, "img_000.jpg")) as s:
             s = s.convert("RGBA")
             simulate = SimImage(s, f"img_000_tar_00{i}")
             simulate.practiceTarget()
+
+    # test letter generation
+    for _ in range(100):
+        print(generateSeed()["letter"])
+        
