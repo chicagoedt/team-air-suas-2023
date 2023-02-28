@@ -138,7 +138,7 @@ def drawLetter(img, letter, color):
 
 class SimImage:
     def __init__(self, s=None, f=None):
-        self.snapshot = s
+        self.snapshot = s.copy()
         self.filename = f
         self.targets = []
 
