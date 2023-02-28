@@ -113,7 +113,7 @@ def drawShape(img, shape, color):
         draw.regular_polygon(
             [img.size[0] / 2, img.size[1] / 2, img.size[0] / 2],
             POLYGONS.index(shape) + 3,
-            fill=color
+            fill=COLORS[color]
         )
 
     return img
@@ -223,4 +223,3 @@ if __name__ == "__main__":
     # test letter generation
     for _ in range(100):
         print(generateSeed()["letter"])
-        
