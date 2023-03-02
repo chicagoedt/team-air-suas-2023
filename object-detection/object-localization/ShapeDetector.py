@@ -1,4 +1,8 @@
+import PIL.ImageOps
 import cv2
+from PIL import ImageOps,Image
+import numpy as np
+from matplotlib import pyplot as plt
 
 DEBUG = True  # todo: turn this off for production
 
@@ -18,11 +22,20 @@ def getHSVHist(path):
 # output: center coordinates of shape
 def findShape(img):
     # initial image processing for contour prep (black and white image with thresholding applied)
+
+    img = Image.fromarray(img)
+    img_posterize = PIL.ImageOps.posterize(img,1)
+    # img_posterize.save("pog.png")
+    # img_posterize.show()
+    # img_invert = PIL.ImageOps.invert(img_posterize)
+    # img_invert.show("pog")
+    img = np.array(img_posterize)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    ret, threshImg = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
-    cv2.imshow("Threshhold?", threshImg)
+    # plt.imshow(gray)
+    # plt.show()
+    ret, threshImg = cv2.threshold(gray, 127 , 255, cv2.THRESH_TOZERO)
     # Get contours
-    contours, _ = cv2.findContours(threshImg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     # first 2 values are x and y coordinates and last is the contour count (number of points)
     shapeInfo = []
 
