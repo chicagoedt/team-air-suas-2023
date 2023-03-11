@@ -1,7 +1,10 @@
 '''
     given target image, determine shape color and letter color
 '''
-from y_imgPreprocessing import *
+
+import cv2
+import y_imgPreprocessing as prepr
+import y_adaptToRealLife as adapt
 from y_colorFunc import *
 
 # convert a list to a frequency dict
@@ -59,7 +62,7 @@ def getShapeAndLetterColor(freqDict):
                 if thirdFreq < freq:
                     thirdColor = color
                     thirdFreq = freq
-            if thirdFreq >= 40:
+            if thirdFreq >= 30:
                 letterColor = thirdColor
     if letterColor == None:
         letterColor = 'Gray'
@@ -82,18 +85,18 @@ def readImgHSVGetShapeAndLetterColor(imgHSV):
     return shapeColor, letterColor
 
 # read image path and get shape and letter color (assuming image is a focus target)
-def readImgPathGetShapeAndLetterColor(img_path):
-    img = cv2.imread(img_path)
+def readImgGetShapeAndLetterColor(img, cropSize):
 
     # preprocessing img and convert img to HSV
-    cropped = cropImage(img, 40, 40)
+    centerCoords = (int(img.shape[1] / 2), int(img.shape[0] / 2))
+    cropped = prepr.cropImage(img, centerCoords, cropSize, cropSize)
     imgHSV = cv2.cvtColor(cropped, cv2.COLOR_BGR2HSV)
 
     # get shape and letter color
     shapeColor, letterColor = readImgHSVGetShapeAndLetterColor(imgHSV)
    
     # show outputs for TESTING
-    original = scaleImg(img, 500)
+    original = prepr.scaleImg(img, 500)
     print('shape:', shapeColor)
     print('letter:', letterColor)
     cv2.imshow('original:', original)
@@ -102,5 +105,10 @@ def readImgPathGetShapeAndLetterColor(img_path):
     cv2.waitKey(0)
     return shapeColor, letterColor
 
-
+# preprocess image before passing to shape and color detection
+def imgPreprocessing(img, stdLightLevel):
+    lightLevel = adapt.measureTargetLightLevel(img)
+    brightnessChange, contrastChange = adapt.getBrightnessContrastChange(lightLevel, stdLightLevel)
+    img = prepr.apply_brightness_contrast(img, brightnessChange, contrastChange)
+    return img
 
