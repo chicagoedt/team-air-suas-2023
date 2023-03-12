@@ -1,0 +1,36 @@
+Background light level:
+-------------------------
+72: 28
+104: 27 -> cuz this one contains a lot of white
+77: 116
+75: 166
+82: 34
+73: 199
+88: 40
+74: 216
+76: 104
+98: 28
+83: 38
+78: 4
+-> so maybe the range of std light level should be 74 with +- 20 extend? -> range 54 to 94 -> round to 50 and 100
+
+
+from measureBackgroundLightLevel2()
+-----------------------------------------------
+74: 266
+81: 31
+96: 30
+73: 179
+76: 42
+75: 197
+77: 57
+78: 38
+79: 33
+83: 31
+91: 26
+72: 22
+82: 36
+97: 4
+92: 6
+84: 2
+-> range: 70 -> 100
