@@ -6,7 +6,6 @@ import numpy as np
 import cv2
 
 import y_imgPreprocessing as prepr
-from y_colorFunc import *
 
 # stdSize = 130, stdScaledWidth = 130, stdCropSize = 60
 def getScaleAndCrop(img_path, stdSize, stdScaledWidth, stdCropSize):
@@ -28,36 +27,37 @@ def getScaleAndCrop(img_path, stdSize, stdScaledWidth, stdCropSize):
     print('>> End getScaleAndCrop')
     return scaledWidth, cropSize
 
+# ignore this
 # give a background image measure light level
-def measureBackgroundLightLevel(img):
-    print('>> in measureBackgroundLightLevel2: measuring light level of image and estimate its average color')
-    imgScaled = prepr.scaleImg(img, 30)
-    imgScaledHSV = cv2.cvtColor(imgScaled, cv2.COLOR_BGR2HSV)
-    height = imgScaled.shape[0]
-    width = imgScaled.shape[1]
-    numPixel = 0
+# def measureBackgroundLightLevel(img):
+#     print('>> in measureBackgroundLightLevel2: measuring light level of image and estimate its average color')
+#     imgScaled = prepr.scaleImg(img, 30)
+#     imgScaledHSV = cv2.cvtColor(imgScaled, cv2.COLOR_BGR2HSV)
+#     height = imgScaled.shape[0]
+#     width = imgScaled.shape[1]
+#     numPixel = 0
 
-    # sum all pixels and get average
-    sumH = 0
-    sumS = 0
-    sumV = 0
-    for y in range(height):
-        for x in range(width):
-            if not (hsvInRangeArray(imgScaledHSV[y][x], lowerWhite_array, upperWhite_array) or hsvInRangeArray(imgScaledHSV[y][x], lowerBlack_array, upperBlack_array)):
-                numPixel += 1
-                sumH += imgScaled[y][x][0]
-                sumS += imgScaled[y][x][1]
-                sumV += imgScaled[y][x][2]
+#     # sum all pixels and get average
+#     sumH = 0
+#     sumS = 0
+#     sumV = 0
+#     for y in range(height):
+#         for x in range(width):
+#             if not (hsvInRangeArray(imgScaledHSV[y][x], lowerWhite_array, upperWhite_array) or hsvInRangeArray(imgScaledHSV[y][x], lowerBlack_array, upperBlack_array)):
+#                 numPixel += 1
+#                 sumH += imgScaled[y][x][0]
+#                 sumS += imgScaled[y][x][1]
+#                 sumV += imgScaled[y][x][2]
     
-    averageColorHSV = np.array([[[int(sumH / numPixel), int(sumS / numPixel), int(sumV / numPixel)]]], dtype = np.uint8)
+#     averageColorHSV = np.array([[[int(sumH / numPixel), int(sumS / numPixel), int(sumV / numPixel)]]], dtype = np.uint8)
     
-    # light level of the average is the V value
-    lightLevel = averageColorHSV[0][0][2]
+#     # light level of the average is the V value
+#     lightLevel = averageColorHSV[0][0][2]
     
-    # show output
-    print('average HSV color: {}, light level: {}'.format(averageColorHSV, lightLevel))
-    print('>> end measureBackgroundLightLevel2')
-    return lightLevel
+#     # show output
+#     print('average HSV color: {}, light level: {}'.format(averageColorHSV, lightLevel))
+#     print('>> end measureBackgroundLightLevel2')
+#     return lightLevel
 
 # get corresponding brightness change and contrast change depending on lightLevel
 # to pass to function apply_brightness_contrast() in y_imgPreprocessing.py
