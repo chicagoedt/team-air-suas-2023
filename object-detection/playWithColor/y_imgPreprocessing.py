@@ -14,11 +14,24 @@ def scaleImg(img, newWidth):
 
 # crop image to rectange whose center = centerCoords and has dimension = width * height
 def cropImage(img, centerCoords, width, height):
-
+    maxWidth = img.shape[1]
+    maxHeight = img.shape[0]
     startRow = centerCoords[1] - int(height / 2)
     endRow = centerCoords[1] + int(height / 2)
     startCol = centerCoords[0] - int(width / 2)
     endCol = centerCoords[0] + int(width / 2)
+    
+    # edge case
+    if startRow < 0:
+        startRow = 0
+    if endRow >= maxHeight:
+        endRow = maxHeight
+    if startCol < 0:
+        startCol = 0
+    if endCol >= maxWidth:
+        endCol = maxWidth
+    print('centerCoords', centerCoords)
+    print('startRow: {}, endRow: {}, startCol: {}, endCol: {}'.format(startRow, endRow, startCol, endCol))
     cropped = img[startRow:endRow, startCol:endCol]
     return cropped
 
