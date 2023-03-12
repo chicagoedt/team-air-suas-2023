@@ -9,8 +9,8 @@ from y_colorDetectionHelper import *
 cropSize = 40
 
 # init images
-folder_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023-fix-target/simulate-images/snapshots/target'
-imgName_list = ['img_022_tar_183_Q.jpg']
+folder_path = 'cropImages'
+imgName_list = ['81_1458_Brown.jpg']
 
 for imgName in imgName_list:
     imgPath = os.path.join(folder_path, imgName)

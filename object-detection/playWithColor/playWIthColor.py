@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 from y_colorFunc import *
 import y_adaptToRealLife as adapt
+import y_imgPreprocessing as prepr
 
 def extractMask(imgHSV, lower_array, upper_array):
     lenArray = len(lower_array)
@@ -20,7 +21,7 @@ def extractMask(imgHSV, lower_array, upper_array):
     return maskTotal
 
 folder_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023-fix-target/simulate-images/snapshots/target'
-filename = 'img_000_tar_003.jpg'
+filename = 'img_019_tar_251_H.jpg'
 
 # path to image
 # file_path = '/Users/mightymanh/Desktop/HSVrange.png'
@@ -30,15 +31,15 @@ img = cv2.imread(file_path)
 # adapt to real life
 lightLevel = adapt.measureBackgroundLightLevel(img)
 difference = 72 - lightLevel
-img = adapt.apply_brightness_contrast(img, difference, -difference)
+img = prepr.apply_brightness_contrast(img, difference, -difference)
 
 # scale target so it's big enough
 imgScaled = img #cv2.resize(img, (300, 300))
 imgScaledHSV = cv2.cvtColor(imgScaled, cv2.COLOR_BGR2HSV)
 
 # hsv bounds for color
-lower_array = lowerRed_array
-upper_array = upperRed_array
+lower_array = lowerGreen_array
+upper_array = upperGreen_array
 
 
 # extract color from imgScaled

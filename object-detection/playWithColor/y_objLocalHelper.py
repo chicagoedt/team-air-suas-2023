@@ -101,10 +101,9 @@ def targetLocalization(img, maskFolder, stdTargetMinSize = 40, stdTargetMaxSize 
             print('-----------------------------------------')
 
         print('#################################################')
-        cv2.imshow(imgName, img)
+        cv2.imshow(imgName, img)   # for TESTING
         cv2.waitKey(0)
 
     cv2.destroyAllWindows()
     print('>> Finish locating targets')
-    print('found coordinates:', TargetFound_list)
     return TargetFound_list
