@@ -1,11 +1,11 @@
-from y_letterImageMapping import *    # textDetection, letterImageMapping
+from y_TextDetection import *    # textDetection, letterImageMapping
+import y_adaptToRealLife as adapt
 import os                             # listdir, path.join
 import numpy as np                    # pdf generator
 from PIL import Image                 # pdf generator
 import itertools                      # permutation
 import random                         # shuffleList
 import statistics                     # mean, median, stdDev
-from y_specialcase import *
 
 ''' ----- helper function for getAccuracyOfTextDetection() ----- '''
 # stack orignal and result image (these imgs are read by cv2)
@@ -55,26 +55,26 @@ def shuffleList(sth_list):
 
 ''' ----- end of helper function for getAccuracyOfLettersImagesMapping() ----- '''
 
-
-def getAccuracyOfTextDetection(folder_path, newWidth, step, letter, numIter):
-    reader = easyocr.Reader(['en'])
+def getAccuracyOfTextDetection(folder_path, reader, letter, stdSize, stdScaledWidth, stdCropSize, numIter, fileName_list, letter_list):
 
     # set up list of target filenames and list of answers list
-    imageNames_list = [i for i in os.listdir(folder_path) if (len(i) == 21 and i[-5] == letter)] # setting all targets to be A
+    imageNames_list = [fileName_list[i] for i in range(len(letter_list)) if letter_list[i] == letter] # setting all targets to be A
     
     # pick randomimages
     randomImageNames = chooseRandomImages(imageNames_list, numIter)
     randomImageNames.sort()
-    answers_list = [i[-5] for i in imageNames_list]
 
     # loop
     correct = 0
     cannotDetect = 0
     wrong = 0
+    wrong_list = []
     for i in range(numIter):
-        print(i, '> Processing: ', randomImageNames[i])
-        img_path = os.path.join(folder_path, randomImageNames[i])
-        result_list = readImgPathDetectLetter(img_path, newWidth, step, reader)
+        imgName = randomImageNames[i] + '.jpg'
+        print(i, '> Processing: ', imgName)
+        img_path = os.path.join(folder_path, imgName)
+        scaledWidth, cropSize = adapt.getScaleAndCrop(img_path, stdSize, stdScaledWidth, stdCropSize)
+        result_list = readImgPathDetectLetter(img_path, reader, scaledWidth, 20, cropSize, cropSize)
         narrow_list = narrowResultList(result_list)
         result_list = [j[1] for j in result_list]
         print('result_list:', result_list)
@@ -83,13 +83,21 @@ def getAccuracyOfTextDetection(folder_path, newWidth, step, letter, numIter):
             print('Cannot detect anything')
             cannotDetect += 1
         else:
-            if answers_list[i] in narrow_list:
+            if letter in narrow_list:
                 print('correct!')
                 correct += 1
             else:
                 print('Wrong :(')
+                wrong_list.append((imgName, result_list, narrow_list))
                 wrong += 1
         print('-----------------------------------')
+
+    # write to text file
+    with open('wrong1.txt', '+a') as f:
+        for item in wrong_list:
+            f.write('Letter: {}\n'.format(letter))
+            f.write(str(item))
+            f.write('\n----------------------------------------------\n')
 
     # print resutls 
     print('##########  Result ########################')
@@ -100,6 +108,8 @@ def getAccuracyOfTextDetection(folder_path, newWidth, step, letter, numIter):
 
     
 
+
+# ignore this guy for now
 # get accuracy of function mapping letters and images
 def getAccuracyOfLettersImagesMapping(folder_path, newWidth, step, numIter):
 

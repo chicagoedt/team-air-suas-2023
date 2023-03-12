@@ -19,21 +19,11 @@ def cropImage(img, width, height):
     cropped = img[startRow:endRow, startCol:endCol]
     return cropped
 
-def imgPreprocessing(img, newWidth): # set newWidth to 100
+def imgPreprocessing(img, scaledWidth, cropWidth, cropHeight): # set newWidth to 100
     # crop to only letter
-    cropped = cropImage(img, 50, 50)
-    croppedScale = scaleImg(cropped, newWidth)
+    cropped = cropImage(img, cropWidth, cropHeight)
+    croppedScale = scaleImg(cropped, scaledWidth)
     croppedBlur = cv2.GaussianBlur(croppedScale, (3,3), 0.5)
     croppedGray = cv2.cvtColor(croppedBlur, cv2.COLOR_BGR2GRAY)
     return croppedGray
 
-if __name__ == "__main__":
-    folder_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023-fix-target/simulate-images/snapshots/target'
-    imgName_list = [i for i in os.listdir(folder_path) if len(i) == 21]
-    for img_name in imgName_list:
-        img_path = os.path.join(folder_path, img_name)
-        img = cv2.imread(img_path)
-        processed = imgPreprocessing(img)
-        cv2.imshow('img', img)
-        cv2.imshow('cropped', processed)
-        cv2.waitKey(0)

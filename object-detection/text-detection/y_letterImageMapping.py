@@ -3,6 +3,8 @@ from y_specialcase import *    # text detection
 import os                      # listdir, pathjoin 
 import itertools               # permutation
 
+# ignore this for now, just messing around
+
 ''' ------------- helper functions for mapLettersToImages() -------------- '''
 def calScore(letters, possibilities_list):
     score = 0

@@ -2,6 +2,8 @@ import cv2
 import ShapeDetector 
 import os 
 import math
+from matplotlib import pyplot as plt
+
 import shutil
 
 # get the expected coordinates 
@@ -74,14 +76,16 @@ def checkAccuracyOfLocalization(folder_path, maxDistance):
         # get foundCoord
         try:
             img = cv2.imread(img_path)
-            _, foundCoord, _ = ShapeDetector.findShape(img)
+            post_img, foundCoord, _ = ShapeDetector.findShape(img)
             print('Expected Coord:', expectedCoord)
+
             # compare two coords
             if isCoordCorrect(expectedCoord, foundCoord, maxDistance):
                 correct += 1
             else:
                 incorrect.append(jpgs_list[i])   # append both incorrect jpgs with its corresponding yolos
                 incorrect.append(yolos_list[i])
+
         except:
             errorFiles.append(jpgs_list[i])   # append both incorrect jpgs with its corresponding yolos
             errorFiles.append(yolos_list[i])
@@ -89,7 +93,12 @@ def checkAccuracyOfLocalization(folder_path, maxDistance):
             print('-----------------------------------')
             continue
         print('-----------------------------------')
+        plt.imshow(post_img)
+        plt.show()
+        cv2.waitKey(0)
 
+
+    # cv2.imsave(img_path + ".png", post_img)
     # print(errorFiles)  # uncomment to show all files that ShapeDetector finds trouble to process
     # print(incorrect) # uncomment to show all files that ShapeDetector fails 
     print('Number of files failed:', int(len(incorrect) / 2))
@@ -112,7 +121,7 @@ def checkAccuracyOfLocalization(folder_path, maxDistance):
 
 #------------------------------------------
 # MAIN
-folder = '/Users/mightymanh/Desktop/myCode/myPy/pytorch stuff/team-air-suas-2023-fix-target/simulate-images/snapshots/target/' # this will be folder that contains jpg files and yolo files
+folder = '../../simulate-images/snapshots/target' # this will be folder that contains jpg files and yolo files
 maxDistance = 40 # need to figure out what the best maxDistance is
 accuracy, errorFiles, incorrect = checkAccuracyOfLocalization(folder, maxDistance) 
 print('maxDistance:', maxDistance)

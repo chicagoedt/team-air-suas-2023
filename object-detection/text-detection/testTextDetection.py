@@ -1,11 +1,20 @@
 from testingHelper import *
+import pandas as pd
 
-folder_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023-fix-target/simulate-images/snapshots/target'
+reader = easyocr.Reader(['en'])
+folderPath = '/Users/mightymanh/Desktop/myCode/myPy/target-practice/simulate-images/snapshots/target_practice'
+csvPath = '/Users/mightymanh/Desktop/myCode/myPy/target-practice/simulate-images/snapshots/target_practice_info.csv'
+df = pd.read_csv(csvPath)
+filename_list = list(df["filename"])
+letter_list = list(df["letter"])
+print('Size of filename_list: {} and size of letter_list: {}'.format(len(filename_list), len(letter_list)))
 
-letters = 'ABCDEFGHJKLMNOPQRSTUVWXYZ' # since easyocr is blind to 'I', I dont include it in here
+# loop
+letters = 'ABCDEFGHJKLMNOPQRSTUVWXYZ0123456789' # since easyocr is blind to 'I', I dont include it in here
 letter_dict = {}
+numIter = 30
 for letter in letters:
-    correct, wrong, cannotDetect = getAccuracyOfTextDetection(folder_path, 120, 20, letter, 30)
+    correct, wrong, cannotDetect = getAccuracyOfTextDetection(folderPath, reader, letter, 130, 130, 50, numIter, filename_list, letter_list)
     letter_dict[letter] = (correct, wrong, cannotDetect)
 
 print('############## OVERALL ######################')
