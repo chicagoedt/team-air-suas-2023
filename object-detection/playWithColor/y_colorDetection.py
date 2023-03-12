@@ -7,7 +7,6 @@ from y_colorDetectionHelper import *
 
 # init hyper variables
 cropSize = 40
-stdLightLevel = 72 # this is light level of simulated targets
 
 # init images
 folder_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023-fix-target/simulate-images/snapshots/target'
