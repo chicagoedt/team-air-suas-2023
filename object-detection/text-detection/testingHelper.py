@@ -1,40 +1,12 @@
-from y_TextDetection import *    # textDetection, letterImageMapping
-import y_adaptToRealLife as adapt
+import cv2
 import os                             # listdir, path.join
-import numpy as np                    # pdf generator
-from PIL import Image                 # pdf generator
 import itertools                      # permutation
 import random                         # shuffleList
 import statistics                     # mean, median, stdDev
 
-''' ----- helper function for getAccuracyOfTextDetection() ----- '''
-# stack orignal and result image (these imgs are read by cv2)
-def stackHorizontal(imgName, imgScaled, results, possibility):
-    # build gutter
-    height = imgScaled.shape[0]
-    gutter = np.full((height, 3, 3), 255, dtype = np.uint8)
+import y_TextDetection as textDetect  # textDetection
+import y_adaptToRealLife as adapt
 
-    # build imgResult
-    imgResult = cv2.cvtColor(results[-1], cv2.COLOR_GRAY2BGR)
-    if len(results) == 5:
-        box = results[0] 
-        cv2.rectangle(imgResult, [int(box[0][0]), int(box[0][1])], [int(box[2][0]), int(box[2][1])], (0, 0, 255), 5)
-        text = str(results[1]) + ', ' + str(possibility) + ', ' + str(round(results[2], 3)) + ', ' + str(results[3]) + 'degree'
-        print('Pass!')
-        cv2.putText(imgResult, text, [int(box[0][0]) - 5, int(box[0][1]) - 5], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)   # draw text
-
-    # stack img, gutter, and resultImg
-    imgStack = cv2.hconcat([imgScaled, gutter, imgResult])
-
-    # put title to imgStack
-    cv2.putText(imgStack, imgName, (6, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-
-    return imgStack
-
-''' ------ end of helper function for getAccuracyOfTextDetection() ------ '''
-
-
-''' ----- helper function for getAccuracyOfLettersImagesMapping() ----- '''
 # choose num random images from images_list, return a list of the chosen images
 def chooseRandomImages(images_list, num):
     randomImages_list = []
@@ -53,16 +25,14 @@ def shuffleList(sth_list):
     idx = random.randint(0, len(permutations_list) - 1)
     return permutations_list[idx]
 
-''' ----- end of helper function for getAccuracyOfLettersImagesMapping() ----- '''
-
-def getAccuracyOfTextDetection(folder_path, reader, letter, stdSize, stdScaledWidth, stdCropSize, numIter, fileName_list, letter_list):
+# read random target imgs that have letter = input letter, text detect it and compared the actual result with expected result
+def getAccuracyOfTextDetection(folder_path, fileName_list, letter_list, reader, letter, stdSize, stdScaledWidth, stdCropSize, numIter):
 
     # set up list of target filenames and list of answers list
     imageNames_list = [fileName_list[i] for i in range(len(letter_list)) if letter_list[i] == letter] # setting all targets to be A
     
     # pick randomimages
     randomImageNames = chooseRandomImages(imageNames_list, numIter)
-    randomImageNames.sort()
 
     # loop
     correct = 0
@@ -70,15 +40,22 @@ def getAccuracyOfTextDetection(folder_path, reader, letter, stdSize, stdScaledWi
     wrong = 0
     wrong_list = []
     for i in range(numIter):
+
+        # init image
         imgName = randomImageNames[i] + '.jpg'
         print(i, '> Processing: ', imgName)
         img_path = os.path.join(folder_path, imgName)
+        img = cv2.imread(img_path)
+
+        # text detect it, get results and narrow results
         scaledWidth, cropSize = adapt.getScaleAndCrop(img_path, stdSize, stdScaledWidth, stdCropSize)
-        result_list = readImgPathDetectLetter(img_path, reader, scaledWidth, 20, cropSize, cropSize)
-        narrow_list = narrowResultList(result_list)
+        result_list = textDetect.readImgDetectLetterWithPreprocessed(img, reader, scaledWidth, 20, cropSize, cropSize)
+        narrow_list = textDetect.narrowResultList(result_list)
         result_list = [j[1] for j in result_list]
         print('result_list:', result_list)
         print('narrow_list:', narrow_list)
+
+        # check accuracy
         if len(narrow_list) == 0:
             print('Cannot detect anything')
             cannotDetect += 1
@@ -93,7 +70,7 @@ def getAccuracyOfTextDetection(folder_path, reader, letter, stdSize, stdScaledWi
         print('-----------------------------------')
 
     # write to text file
-    with open('wrong1.txt', '+a') as f:
+    with open('wrong.txt', '+a') as f:
         for item in wrong_list:
             f.write('Letter: {}\n'.format(letter))
             f.write(str(item))
@@ -108,44 +85,43 @@ def getAccuracyOfTextDetection(folder_path, reader, letter, stdSize, stdScaledWi
 
     
 
-
 # ignore this guy for now
 # get accuracy of function mapping letters and images
-def getAccuracyOfLettersImagesMapping(folder_path, newWidth, step, numIter):
+# def getAccuracyOfLettersImagesMapping(folder_path, newWidth, step, numIter):
 
-    imageNames_list = [i for i in os.listdir(folder_path) if len(i) == 21]
-    score_list = []   
-    for i in range(numIter):
-        print('#############################################')
-        print('loop number', i)
-        score = 0
+#     imageNames_list = [i for i in os.listdir(folder_path) if len(i) == 21]
+#     score_list = []   
+#     for i in range(numIter):
+#         print('#############################################')
+#         print('loop number', i)
+#         score = 0
 
-        # choose 5 random images from list of images
-        randomImageNames = chooseRandomImages(imageNames_list, 5)
-        # get answers from "judge" 
-        letters = [i[-5] for i in randomImageNames]
-        letters = shuffleList(letters)
+#         # choose 5 random images from list of images
+#         randomImageNames = chooseRandomImages(imageNames_list, 5)
+#         # get answers from "judge" 
+#         letters = [i[-5] for i in randomImageNames]
+#         letters = shuffleList(letters)
 
-        print('Judge gives:', letters)
-        print('Image taken from cams:', randomImageNames)
+#         print('Judge gives:', letters)
+#         print('Image taken from cams:', randomImageNames)
 
-        # read every imageNames to possibilities and store image and its corresponding possibilites/None into a dictionary
-        mapping_result = mapLettersToImages(letters, randomImageNames, folder_path, newWidth, step)
+#         # read every imageNames to possibilities and store image and its corresponding possibilites/None into a dictionary
+#         mapping_result = mapLettersToImages(letters, randomImageNames, folder_path, newWidth, step)
 
-        for imageName, letter in mapping_result.items():
-            if imageName[-5] == letter:
-                score += 1
-        print('Score:', score)
-        score_list.append(score)
-        print('#############################################')
+#         for imageName, letter in mapping_result.items():
+#             if imageName[-5] == letter:
+#                 score += 1
+#         print('Score:', score)
+#         score_list.append(score)
+#         print('#############################################')
     
-    # get average, median of score_list:
-    mean = statistics.mean(score_list)
-    median = statistics.median(score_list)
-    stdDeviation = statistics.stdev(score_list)
-    print('Mean:', mean)
-    print('Median:', median)
-    print('Standard Deviation:', stdDeviation)
+#     # get average, median of score_list:
+#     mean = statistics.mean(score_list)
+#     median = statistics.median(score_list)
+#     stdDeviation = statistics.stdev(score_list)
+#     print('Mean:', mean)
+#     print('Median:', median)
+#     print('Standard Deviation:', stdDeviation)
 
 
         

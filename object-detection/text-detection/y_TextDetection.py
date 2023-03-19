@@ -1,6 +1,6 @@
 '''
-    assume the inputed image has only one printed letter.
-    detect the letter
+    tools for text detection.
+    assume the inputed image has only one printed letter. detect the letter
 '''
 
 import cv2                          # for reading image and processing image
@@ -33,32 +33,83 @@ def detectLetter(rotations_list, reader):
                 result_list.append(result)               
     
     return result_list
+            #  box coordinates, letter, confidence level, angle of rotation, the preprocessed image
 
 # detect letter in img
-def readImgDetectLetter(img, step, reader):
+def readImgDetectLetter(img, reader, step):
+    print('>> Begin readImgDetectLetter:')
+    startTime = time.time()
+
+    # get a list of rotations
     rotations_list = listRotations(img, step)
+
+    # text Result
     result_list = detectLetter(rotations_list, reader)
-    # print(results)
+    print('Time:', time.time() - startTime)
+    print('>> End readImgdetectLetter.')
     return result_list
+        #  box coordinates, letter, confidence level, angle of rotation, the preprocessed image
 
-# read img but with preprocess image
-def readImgDetectLetter2(img, reader, scaledWidth, step, cropWidth, cropHeight):
-    print('>> Begin readImgDetectLetter2:')
+# preprocess img, read preprocessed img, detect letter
+def readImgDetectLetterWithPreprocessed(img, reader, scaledWidth, step, cropWidth, cropHeight):
+    print('>> Begin readImgDetectLetterWithPreprocessed:')
     startTime = time.time()
+
+    # preprocessed img
     processed = prepr.imgPreprocessing(img, scaledWidth, cropWidth, cropHeight)
+
+    # get a list of rotations
     rotations = listRotations(processed, step)
+
+    # text Result
     result_list = detectLetter(rotations, reader)
     print('Time:', time.time() - startTime)
-    print('>> End readImgdetectLetter2.')
+    print('>> End readImgdetectLetterWithPreprocessed.')
     return result_list
+        #  box coordinates, letter, confidence level, angle of rotation, the preprocessed image
 
-# read image path detect letter
-def readImgPathDetectLetter(img_path, reader, scaledWidth, step, cropWidth, cropHeight):
+
+#--------------------------------------------------------
+
+# check if target contains letter
+def checkTargetHaveLetter(rotations_list, reader):
+    targetHaveLetter = False
+    # pass all rotated versions to model and get results
+    for rotation in rotations_list: 
+        output = reader.readtext(rotation[0])
+        if len(output) != 0:
+            targetHaveLetter = True
+            break           
+    
+    return targetHaveLetter
+
+def readImgCheckTargetHaveLetter(img, reader, step):
+    print('>> Begin readImgCheckTargetHaveLetter:')
     startTime = time.time()
-    img = cv2.imread(img_path)
-    processed = prepr.imgPreprocessing(img, scaledWidth, cropWidth, cropHeight)
-    rotations = listRotations(processed, step)
-    result_list = detectLetter(rotations, reader)
-    print('Time:', time.time() - startTime)
-    return result_list
 
+    # get a list of rotations
+    rotations_list = listRotations(img, step)
+
+    # text Result
+    targetHaveLetter = checkTargetHaveLetter(rotations_list, reader)
+    print('Time:', time.time() - startTime)
+    print('>> End readImgCheckTargetHaveLetter.')
+    return targetHaveLetter
+
+# preprocess img, read img and check if having letter
+def readImgCheckTargetHaveLetterWithPreprocessed(img, reader, scaledWidth, step, cropWidth, cropHeight):
+    print('>> Begin readImgCheckTargetHaveLetterWithPreprocessed:')
+    startTime = time.time()
+
+    # preprocessed img
+    processed = prepr.imgPreprocessing(img, scaledWidth, cropWidth, cropHeight)
+
+    # get a list of rotations
+    rotations = listRotations(processed, step)
+
+    # text Result
+    targetHaveLetter = checkTargetHaveLetter(rotations, reader)
+    print('status:', targetHaveLetter)
+    print('Time:', time.time() - startTime)
+    print('>> End readImgCheckTargetHaveLetterWithPreprocessed.')
+    return targetHaveLetter

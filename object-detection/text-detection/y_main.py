@@ -1,35 +1,52 @@
 '''
-    read selected images and detect letters
+    read input images and detect letters
 '''
 
 import os
 import cv2
 import easyocr
-from y_TextDetection import *           # text detection
+import y_TextDetection as textDetect    # text detection
 import y_adaptToRealLife as adapt       # get cropSize and scaledWidth
 import y_imgPreprocessing as prepr      # img preprocessing
+import testingHelper as help
+import mainHelper
+import time
 
+# init hyper variables
+stdSize = 125
+stdScaledWidth = 120
+stdCropSize = 45
 
 # init images
 reader = easyocr.Reader(['en'])
-folder_path = '/Users/mightymanh/Desktop/real-images/drive-download-20230304T223241Z-001'
-imgName_list = ['p9.jpg']
+folder_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023/object-detection/playWithColor/cropImages'
+imgName_list = [i for i in os.listdir(folder_path) if i[-4:] == '.jpg']
 
+
+targetList = []
+
+start = time.time()
+
+# check if target is valid: check if target has letter
+step = 20
+print('##################### Check target has letter #####################\n')
 for imgName in imgName_list:
     print(imgName)
     img_path = os.path.join(folder_path, imgName)
     img = cv2.imread(img_path)
+    TargetHaveLetter = mainHelper.checkImgHavingLetter(img, reader, stdSize, stdScaledWidth, stdCropSize, step)
+    if TargetHaveLetter:
+        targetList.append(imgName)
+    print('--------------------------------------')
 
-    # detect letter
-    scaledWidth, cropSize = adapt.getScaleAndCrop(img_path, 130, 130, 50)
-    result_list = readImgDetectLetter2(img, reader, scaledWidth, 20, cropSize, cropSize) 
-    narrow_list = narrowResultList(result_list)
-    result_list = [i[1] for i in result_list] # simplify result_list for nicer print
+# deep read
+step = 10
+print('\n\n################# Deep read ######################\n')
+for target in targetList:
+    print(target)
+    img_path = os.path.join(folder_path, target)
+    img = cv2.imread(img_path)
+    mainHelper.deepReadImgReadLetter(img, reader, stdSize, stdScaledWidth, stdCropSize, step)
+    print('--------------------------------------')
 
-    # show results
-    print('What easyocr gets:', result_list)
-    print('What we deduce from results get by easyocr:', narrow_list)
-    print('----------------------------')
-    cv2.imshow('original', img)
-    cv2.imshow('processed', prepr.imgPreprocessing(img, scaledWidth, cropSize, cropSize))  # for TESTING
-    cv2.waitKey(0) # for TESTING
+print('Overall time:', time.time() - start)
