@@ -5,7 +5,7 @@
 import cv2
 import y_imgPreprocessing as prepr
 import y_adaptToRealLife as adapt
-from y_colorFunc import *
+import y_colorFunc as color
 
 # convert a list to a frequency dict
 def list2FreqDict(color_list):
@@ -76,7 +76,7 @@ def readImgHSVGetShapeAndLetterColor(imgHSV):
     lenX = imgHSV.shape[1]
     for x in range(lenX):
         for y in range(lenY):
-            color = getColorOfPixel(imgHSV[y][x])
+            color = color.getColorOfPixel(imgHSV[y][x])
             color_list.append(color)
     freqDict = list2FreqDict(color_list)
     print(freqDict) # for TESTING

@@ -30,8 +30,6 @@ def cropImage(img, centerCoords, width, height):
         startCol = 0
     if endCol >= maxWidth:
         endCol = maxWidth
-    print('centerCoords', centerCoords)
-    print('startRow: {}, endRow: {}, startCol: {}, endCol: {}'.format(startRow, endRow, startCol, endCol))
     cropped = img[startRow:endRow, startCol:endCol]
     return cropped
 

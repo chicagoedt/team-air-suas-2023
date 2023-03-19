@@ -2,6 +2,7 @@
     given a pixel with known hsv value, determine color
 '''
 
+import cv2
 from y_color import *
 
 # check if hsv is in range input lower and input upper
@@ -23,7 +24,6 @@ def hsvInRangeArray(hsv, lower_array, upper_array):
             
     return False    
     
-
 # get the color name that best match with input hsv
 def getColorOfPixel(hsv):
     # white
@@ -66,3 +66,15 @@ def getColorOfPixel(hsv):
         return 'Orange'
     
     return None
+
+# turn all HSVpixels that is in range lower_array and upper_array to white. others turn to black
+def extractMask(imgHSV, lower_array, upper_array):
+    lenArray = len(lower_array)
+    mask_array = []
+    for i in range(lenArray):
+        mask = cv2.inRange(imgHSV, lower_array[i], upper_array[i])
+        mask_array.append(mask)
+    maskTotal = np.zeros((imgHSV.shape[0], imgHSV.shape[1]), dtype = np.uint8)
+    for mask in mask_array:
+        maskTotal = cv2.bitwise_or(maskTotal, mask)
+    return maskTotal
