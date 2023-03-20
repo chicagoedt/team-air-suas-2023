@@ -1,5 +1,5 @@
 '''
-    Goal: locate targets using color (except gray objects), assuming input image is 4K (3K is still fine)
+    Goal: locate targets using color (except gray objects)
 '''
 import os
 import cv2
@@ -30,7 +30,7 @@ for imgName in imgName_list:
 
     # target locating
     maskFolder = 'maskFolder' # check maskFolder to understand
-    TargetFound_list = targetLoc.targetLocalization(imgPreprocessed, maskFolder, stdTargetMinSize, stdTargetMaxSize, stdMinAreaRatio)
+    TargetFound_list = targetLoc.targetLocation(imgPreprocessed, maskFolder, stdTargetMinSize, stdTargetMaxSize, stdMinAreaRatio)
     for targetFound in TargetFound_list:
         print(targetFound)
         # color, centerCoords, targetSize

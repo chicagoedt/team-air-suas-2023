@@ -46,7 +46,7 @@ def writeMaskToMaskFolder(maskList, destFolder):
     return imgName_list
 
 # detect shapes that is valid (valid size and valid area)
-def ShapeDetector(img, imgName, targetMinSize, targetMaxSize, minAreaRatio):
+def findShape(img, imgName, targetMinSize, targetMaxSize, minAreaRatio):
 
     # gray scale img
     imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -96,7 +96,7 @@ def ShapeDetector(img, imgName, targetMinSize, targetMaxSize, minAreaRatio):
     return possibleTarget_list
 
 # main function that locates targets and also determine its shape color
-def targetLocalization(img, maskFolder, stdTargetMinSize, stdTargetMaxSize, stdAreaRatio):
+def targetLocation(img, maskFolder, stdTargetMinSize, stdTargetMaxSize, stdAreaRatio):
 
     # collect mask
     mask_list = collectingMasks(img)
@@ -106,17 +106,17 @@ def targetLocalization(img, maskFolder, stdTargetMinSize, stdTargetMaxSize, stdA
 
     # target localization
     TargetFound_list = []
-    print('>> Begin locating targets')
+    print('>> Begin targetLocation:')
     for imgName in imgName_list:
         print(imgName)
         color = nameHelper.cutExtension(imgName)
         imgPath = os.path.join(maskFolder, imgName)
         img = cv2.imread(imgPath)
         # detect possible targets
-        TargetFound_list.extend(ShapeDetector(img, color, stdTargetMinSize, stdTargetMaxSize, stdAreaRatio))
-        print('#################################################')
+        TargetFound_list.extend(findShape(img, color, stdTargetMinSize, stdTargetMaxSize, stdAreaRatio))
+        print('------------------------------------------------')
     
-    print('>> Finish locating targets!')
+    print('>> Finish targetLocation!')
     return TargetFound_list
             # color, centroid, averageSize
 
