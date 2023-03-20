@@ -5,7 +5,7 @@
 import cv2
 import y_imgPreprocessing as prepr
 import y_adaptToRealLife as adapt
-import y_colorFunc as color
+import y_colorFunc as colorFunc
 
 # convert a list to a frequency dict
 def list2FreqDict(color_list):
@@ -76,7 +76,7 @@ def readImgHSVGetShapeAndLetterColor(imgHSV):
     lenX = imgHSV.shape[1]
     for x in range(lenX):
         for y in range(lenY):
-            color = color.getColorOfPixel(imgHSV[y][x])
+            color = colorFunc.getColorOfPixel(imgHSV[y][x])
             color_list.append(color)
     freqDict = list2FreqDict(color_list)
     print(freqDict) # for TESTING
@@ -85,7 +85,13 @@ def readImgHSVGetShapeAndLetterColor(imgHSV):
     return shapeColor, letterColor
 
 # read image path and get shape and letter color (assuming image is a focus target)
-def readImgGetShapeAndLetterColor(img, cropSize):
+def readImgGetShapeAndLetterColor(img, cropColorRatio):
+    print('>> Begin readImgGetShapeAndLetterColor:')
+
+    # get crop size
+    averageTargetSize = int((img.shape[0] + img.shape[1]) / 2)
+    cropSize = int(averageTargetSize * cropColorRatio)
+    print('target image has size: {}, input cropColorRatio: {} -> cropSize: {}'.format(averageTargetSize, cropColorRatio, cropSize))
 
     # preprocessing img and convert img to HSV
     centerCoords = (int(img.shape[1] / 2), int(img.shape[0] / 2))
@@ -94,21 +100,15 @@ def readImgGetShapeAndLetterColor(img, cropSize):
 
     # get shape and letter color
     shapeColor, letterColor = readImgHSVGetShapeAndLetterColor(imgHSV)
-   
-    # show outputs for TESTING
-    original = prepr.scaleImg(img, 500)
-    print('shape:', shapeColor)
-    print('letter:', letterColor)
-    cv2.imshow('original:', original)
-    cv2.imshow('cropped:', cropped)
-    print('press any key to continue ;)') 
-    cv2.waitKey(0)
+    print('shape color: {}, letter color: {}'.format(shapeColor, letterColor))
+    print('>> Finish readImgGetShapeAndLetterColor!')
+
+    # show outputs 
+    # original = prepr.scaleImg(img, 500)
+    # cv2.imshow('original:', original)           # for TESTING
+    # cv2.imshow('cropped:', cropped)
+    # print('press any key to continue ;)') 
+    # cv2.waitKey(0)
     return shapeColor, letterColor
 
-# preprocess image before passing to shape and color detection
-def imgPreprocessing(img, stdLightLevel):
-    lightLevel = adapt.measureTargetLightLevel(img)
-    brightnessChange, contrastChange = adapt.getBrightnessContrastChange(lightLevel, stdLightLevel)
-    img = prepr.apply_brightness_contrast(img, brightnessChange, contrastChange)
-    return img
 
