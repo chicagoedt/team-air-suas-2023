@@ -2,9 +2,6 @@ import cv2
 import ShapeDetector
 
 
-#for testing, ignore
-hist_h, hist_s, hist_v = ShapeDetector.getHSVHist("star.jpg")
-
 # Cv2 setup reading image
 img = cv2.imread("real.jpg")
 
