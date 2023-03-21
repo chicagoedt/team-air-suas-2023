@@ -5,9 +5,9 @@
 import os
 import cv2
 import numpy as np
-import y_colorFunc as color
-import y_adaptToRealLife as adapt
-import y_imgPreprocessing as prepr
+import tool_colorFunc as color
+import tool_adaptToRealLife as adapt
+import tool_imgPreprocessing as prepr
 
 def extractMask(imgHSV, lower_array, upper_array):
     lenArray = len(lower_array)

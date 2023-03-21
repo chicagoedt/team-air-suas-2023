@@ -3,9 +3,9 @@
 '''
 
 import cv2
-import y_imgPreprocessing as prepr
-import y_adaptToRealLife as adapt
-import y_colorFunc as colorFunc
+import tool_imgPreprocessing as prepr
+import tool_adaptToRealLife as adapt
+import tool_colorFunc as colorFunc
 
 # convert a list to a frequency dict
 def list2FreqDict(color_list):
@@ -104,11 +104,11 @@ def readImgGetShapeAndLetterColor(img, cropColorRatio):
     print('>> Finish readImgGetShapeAndLetterColor!')
 
     # show outputs 
-    # original = prepr.scaleImg(img, 500)
+    # original = prepr.scaleImg(img, 500)         # for TESTING
     # cv2.imshow('original:', original)           # for TESTING
-    # cv2.imshow('cropped:', cropped)
-    # print('press any key to continue ;)') 
-    # cv2.waitKey(0)
+    # cv2.imshow('cropped:', cropped)             # for TESTING
+    # print('press any key to continue ;)')       # for TESTING
+    # cv2.waitKey(0)                              # for TESTING
     return shapeColor, letterColor
 
 

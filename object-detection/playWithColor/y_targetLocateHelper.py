@@ -5,10 +5,10 @@
 import cv2
 import numpy as np
 import os
-import y_colorFunc as colorFunc              # color
-import y_adaptToRealLife as adapt            # real image: light level
-import y_imgPreprocessing as prepr           # preprocessing img
-import nameFormatHelper as nameHelper        # deal with file name
+import tool_colorFunc as colorFunc              # color
+import tool_adaptToRealLife as adapt            # real image: light level
+import tool_imgPreprocessing as prepr           # preprocessing img
+import tool_nameFormatHelper as nameHelper        # deal with file name
 
 # preprocessing img before locating targets
 def imgPreprocessing(img):
@@ -87,13 +87,14 @@ def findShape(img, imgName, targetMinSize, targetMaxSize, minAreaRatio):
             possibleTarget_list.append([imgName, centroid, averageSize])
 
     #         # draw the yellow box around the target
-    #         box = cv2.boxPoints(rect)
-    #         box = np.intp(box)              # not sure if this line is necessary  # uncomment for TESTING
-    #         img = cv2.drawContours(img, [box], 0, (0,255,255), 2)
-    # cv2.imshow(imgName, img)   # for TESTING
-    # cv2.waitKey(0)
+    #         box = cv2.boxPoints(rect)                                             # for TESTING
+    #         box = np.intp(box)              # not sure if this line is necessary  # for TESTING
+    #         img = cv2.drawContours(img, [box], 0, (0,255,255), 2)                 # for TESTING
+    # cv2.imshow(imgName, img)                                                      # for TESTING
+    # cv2.waitKey(0)                                                                # for TESTING
 
     return possibleTarget_list
+
 
 # main function that locates targets and also determine its shape color
 def targetLocation(img, maskFolder, stdTargetMinSize, stdTargetMaxSize, stdAreaRatio):

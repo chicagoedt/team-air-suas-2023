@@ -7,8 +7,8 @@
 import numpy as np
 import cv2
 
-import y_imgPreprocessing as prepr
-import y_colorFunc as colorFunc
+import tool_imgPreprocessing as prepr
+import tool_colorFunc as colorFunc
 
 # give a background image measure light level
 def measureBackgroundLightLevel(img):
