@@ -2,6 +2,8 @@ import easyocr
 import testingHelper as help
 import pandas as pd
 
+# ignore this guy for now
+
 # init text detection model
 reader = easyocr.Reader(['en'])
 

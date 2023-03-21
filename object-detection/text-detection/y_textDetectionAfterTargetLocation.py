@@ -1,52 +1,51 @@
 '''
-    read input images and detect letters
+    first, run y_targetLocate.py in playWithColor/ to get possible targets
+    Then, we determine which target is valid (which target has letter) and read the letter
 '''
 
 import os
 import cv2
 import easyocr
-import y_TextDetection as textDetect    # text detection
-import y_adaptToRealLife as adapt       # get cropSize and scaledWidth
-import y_imgPreprocessing as prepr      # img preprocessing
-import testingHelper as help
-import mainHelper
 import time
+
+import y_TextDetectionHelper as textDetect
+import y_checkTargetHaveLetterHelper as checkTarget
+
 
 # init hyper variables
 stdSize = 125
 stdScaledWidth = 120
-stdCropSize = 45
+stdCropSize = 50
 
-# init images
+# init model and start timer
 reader = easyocr.Reader(['en'])
-folder_path = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023/object-detection/playWithColor/cropImages'
-imgName_list = [i for i in os.listdir(folder_path) if i[-4:] == '.jpg']
-
-
-targetList = []
-
 start = time.time()
 
+# init images
+folder_path = '../playWithColor/cropImages'
+imgName_list = [i for i in os.listdir(folder_path) if i[-4:] == '.jpg']
+
 # check if target is valid: check if target has letter
+targetList = []
 step = 20
 print('##################### Check target has letter #####################\n')
 for imgName in imgName_list:
     print(imgName)
     img_path = os.path.join(folder_path, imgName)
     img = cv2.imread(img_path)
-    TargetHaveLetter = mainHelper.checkImgHavingLetter(img, reader, stdSize, stdScaledWidth, stdCropSize, step)
+    TargetHaveLetter = checkTarget.deepReadImgCheckTargetHaveLetter(img, reader, stdSize, stdScaledWidth, stdCropSize, step)
     if TargetHaveLetter:
         targetList.append(imgName)
     print('--------------------------------------')
 
-# deep read
+# deep read the target that has letter
 step = 10
 print('\n\n################# Deep read ######################\n')
 for target in targetList:
     print(target)
     img_path = os.path.join(folder_path, target)
     img = cv2.imread(img_path)
-    mainHelper.deepReadImgReadLetter(img, reader, stdSize, stdScaledWidth, stdCropSize, step)
+    textDetect.deepReadImgDetectLetter(img, reader, stdSize, stdScaledWidth, stdCropSize, step)
     print('--------------------------------------')
 
 print('Overall time:', time.time() - start)

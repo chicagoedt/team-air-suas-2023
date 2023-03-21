@@ -4,8 +4,10 @@ import itertools                      # permutation
 import random                         # shuffleList
 import statistics                     # mean, median, stdDev
 
-import y_TextDetection as textDetect  # textDetection
-import y_adaptToRealLife as adapt
+import y_TextDetectionHelper as textDetect  # textDetection
+
+# ignore this guy for now
+
 
 # choose num random images from images_list, return a list of the chosen images
 def chooseRandomImages(images_list, num):
@@ -122,11 +124,4 @@ def getAccuracyOfTextDetection(folder_path, fileName_list, letter_list, reader, 
 #     print('Mean:', mean)
 #     print('Median:', median)
 #     print('Standard Deviation:', stdDeviation)
-
-
-        
-        
-            
-        
-
     

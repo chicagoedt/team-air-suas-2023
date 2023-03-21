@@ -1,4 +1,4 @@
-from y_TextDetection import *  # text detection
+from y_TextDetectionHelper import *  # text detection
 from y_specialcase import *    # text detection
 import os                      # listdir, pathjoin 
 import itertools               # permutation
