@@ -2,6 +2,11 @@ import os
 import cv2
 import numpy as np
 
+# tools_imgPreprocessing
+import sys
+sys.path.append("..")
+import computerVisionTools.tool_imgPreprocessing as prepr
+
 DEBUG = True  # todo: turn this off for production
 
 
@@ -39,9 +44,9 @@ def findShape(img):
     img = cv2.imread(img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    kernel_size = 13
+    kernel_size = 9
     blur_gray = cv2.GaussianBlur(gray, (kernel_size, kernel_size), 0)
-    cv2.imwrite("blurred13.jpeg", blur_gray)
+    contrast = prepr.apply_brightness_contrast(blur_gray, 73, 95)
     low_threshold = 90
     high_threshold = 255
     edges = cv2.Canny(blur_gray, low_threshold, high_threshold)
@@ -64,6 +69,7 @@ def findShape(img):
     # Draw the lines on the  image
     lines_edges = cv2.addWeighted(img, 0.8, line_image, 1, 0)
     print("Found: ", len(lines), "Lines")
+    cv2.imwrite("edges.jpeg", lines_edges)
     cv2.imshow('lines', lines_edges)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
