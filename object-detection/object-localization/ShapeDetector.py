@@ -1,104 +1,69 @@
-import PIL.ImageOps
+import os
 import cv2
-from PIL import ImageOps,Image
 import numpy as np
-from matplotlib import pyplot as plt
 
 DEBUG = True  # todo: turn this off for production
 
 
-def increaseContrast(original):
-    # We first blur the image to get rid of the cracks on the asphalt
-    blur = cv2.GaussianBlur(original, (9, 9), 10)
-    if DEBUG:
-        cv2.imshow("Gaussian blur image", blur)
-        cv2.waitKey(0)
-    # converting to LAB color space
-    lab = cv2.cvtColor(blur, cv2.COLOR_BGR2LAB)
-    l_channel, a, b = cv2.split(lab)
+def optionTwo():
+    # load the image and resize it to a smaller factor so that
+    # the shapes can be approximated better
+    image = cv2.imread(args["image"])
+    resized = imutils.resize(image, width=300)
+    ratio = image.shape[0] / float(resized.shape[0])
+    # convert the resized image to grayscale, blur it slightly,
+    # and threshold it
+    gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY)[1]
 
-    # Applying CLAHE to L-channel
-    # feel free to try different values for the limit and grid size:
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    cl = clahe.apply(l_channel)
 
-    # merge the CLAHE enhanced L-channel with the a and b channel
-    limg = cv2.merge((cl, a, b))
-
-    # Converting image from LAB Color model to BGR color spcae
-    enhanced_img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
-
-    # Stacking the original image with the enhanced image
-    result = np.hstack((blur, enhanced_img))
-    if DEBUG:
-        cv2.imshow('Result', result)
-        cv2.waitKey(0)
-
-    return blur
-
-# initial image processing for contour prep (black and white image with thresholding applied)
-def contourPrep(original):
-    gray = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
-    ret, threshImg = cv2.threshold(gray, 180, 255, cv2.THRESH_TOZERO)
-    cv2.imshow("Threshold",threshImg)
-    cv2.waitKey(0)
-    print("We reached the breakpoint")
+# Most likely used for testing only
+# input: directory where cropped images are stored
+# output: list of filenames for the shapedetector to work
+def getImageNames(directory):
+    # iterate over files in
+    # that directory
+    files = []
+    for filename in os.listdir(directory):
+        f = os.path.join(directory, filename)
+        # checking if it is a file
+        if os.path.isfile(f):
+            files.append(f)
+    return files
 
 
 # input: cv2 generated image using imshow (numpy array)
 # output: center coordinates of shape
 def findShape(img):
-    ## Manhs stuff idk wtf this does
-    # img = Image.fromarray(img)
-    # img_posterize = PIL.ImageOps.posterize(img,1)
-    # img_posterize.show()
-    # img = np.array(img_posterize)
+    img = cv2.imread(img)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    blurred = increaseContrast(img)
-    contourPrep(blurred)
+    kernel_size = 13
+    blur_gray = cv2.GaussianBlur(gray, (kernel_size, kernel_size), 0)
+    cv2.imwrite("blurred13.jpeg", blur_gray)
+    low_threshold = 90
+    high_threshold = 255
+    edges = cv2.Canny(blur_gray, low_threshold, high_threshold)
+    rho = 1  # distance resolution in pixels of the Hough grid
+    theta = np.pi / 180  # angular resolution in radians of the Hough grid
+    threshold = 15  # minimum number of votes (intersections in Hough grid cell)
+    min_line_length = 5  # minimum number of pixels making up a line
+    max_line_gap = 10  # maximum gap in pixels between connectable line segments
+    line_image = np.copy(img) * 0  # creating a blank to draw lines on
 
+    # Run Hough on edge detected image
+    # Output "lines" is an array containing endpoints of detected line segments
+    lines = cv2.HoughLinesP(edges, rho, theta, threshold, np.array([]),
+                            min_line_length, max_line_gap)
 
-    # Get contours
-    contours, _ = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # first 2 values are x and y coordinates and last is the contour count (number of points)
-    shapeInfo = []
+    for line in lines:
+        for x1, y1, x2, y2 in line:
+            cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 5)
 
-    # opencv detects many contours within the image
-    # including the image shape itself (which is index 0 and should be ignored)
-    contourCount = 0
-
-    if DEBUG:
-        print("Found contours: ", len(contours)) # commented by MANH
-    for contour in contours:
-        cv2.drawContours(img, [contour], 0, (0, 0, 255), 5) # commented by MANH to unable drawing contours
-        approx = cv2.approxPolyDP(contour, 0.01 * cv2.arcLength(contour, True), True)
-        M = cv2.moments(contour)
-        if M['m00'] != 0.0:
-            x = int(M['m10'] / M['m00'])
-            y = int(M['m01'] / M['m00'])
-            shapeInfo.append((x, y, len(approx)))
-            # if DEBUG:
-            #     print("Contour #: ", contourCount, "Number of points: ", len(approx), "Location: ({},{})".format(x, y)) # commented by MANH
-        contourCount += 1
-
-    # Getting the points count that appears the most in the shapeInfo list
-    _, _, contourModeCount = max(set(shapeInfo), key=shapeInfo.count)
-    if DEBUG:
-        print(shapeInfo)
-        print("The most occurring shape in this image has {} points".format(contourModeCount)) # commented by MANH
-    # todo: handle edge case where there is no mode found
-    # Getting the average coordinates for the shape with found contourModeCount value
-    xSum = 0
-    ySum = 0
-    i = 0
-    for shape in shapeInfo:
-        if shape[2] == contourModeCount:
-            # if DEBUG: print("Iterating thru: ", shape) # commented by MANH
-            xSum = xSum + shape[0]
-            ySum = ySum + shape[1]
-            i += 1
-    avgCoords = (int(xSum / i), int(ySum / i))
-    cv2.circle(img, avgCoords, radius=1, color= (255,0,0), thickness=1)
-    if DEBUG: print("Average coordinate location: ", avgCoords)
-    print('exit ShapeDetector')
-    return img, avgCoords, contourModeCount
+    # Draw the lines on the  image
+    lines_edges = cv2.addWeighted(img, 0.8, line_image, 1, 0)
+    print("Found: ", len(lines), "Lines")
+    cv2.imshow('lines', lines_edges)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
