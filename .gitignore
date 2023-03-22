@@ -17,4 +17,5 @@ simulate-images/final_images/*
 datas/
 *.png~
 *.xcf
+*.tlog*
 
