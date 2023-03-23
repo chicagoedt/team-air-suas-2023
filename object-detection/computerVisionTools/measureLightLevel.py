@@ -8,7 +8,7 @@ import tool_adaptToRealLife as adapt
 import tool_testingHelper as help
 
 # init images
-folderPath = '/Users/mightymanh/Desktop/15march'
+folderPath = '/Users/mightymanh/Desktop/real images/march15'
 imgName_list = [i for i in os.listdir(folderPath) if i[-4:] == '.jpg' or i[-5:] == '.jpeg']
 print('Number of img in the list:', len(imgName_list))
 
@@ -24,7 +24,7 @@ for imgName in imgName_list:
     img = cv2.imread(imgPath)
 
     # measure light level of img
-    lightLevel = adapt.deepMeasureBackgroundLightLevel(img)
+    lightLevel = adapt.measureBackgroundLightLevel(img)
 
     # add to list for later stats analysis
     if lightLevel in freqDict:
@@ -36,6 +36,7 @@ for imgName in imgName_list:
     sum += lightLevel
 
 # print stats
+print('#################### OVERALL: Measuring light level (light intensity) ########################')
 for lightLevel, freq in freqDict.items():
     print('{}: {}'.format(lightLevel, freq))
 average = sum / counter
