@@ -4,7 +4,7 @@
 import cv2
 import numpy as np
 
-color = [109, 89, 23]
+color = [44, 100, 70]
 
 colors = np.zeros((300, 300, 3), dtype = np.uint8)
 height = len(colors)

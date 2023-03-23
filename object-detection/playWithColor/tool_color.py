@@ -43,8 +43,8 @@ lowerBlue_array = [lower_blue]
 upperBlue_array = [upper_blue]
 
 # green
-lower_green = np.array([44, 100, 100])
-upper_green = np.array([72, 255, 255])
+lower_green = np.array([44, 100, 70])
+upper_green = np.array([80, 255, 255])
 lowerGreen_array = [lower_green]
 upperGreen_array = [upper_green]
 

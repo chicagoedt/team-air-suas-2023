@@ -22,11 +22,11 @@ def click_event(event, x, y, flags, params):
 # path to image
 folder_path = '/Users/mightymanh/Desktop/t1'
 filename = 'Frame-15-03-2023-07-31-42.jpeg'
-filePath = os.path.join(folder_path, filename)
+filePath = os.path.join('/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023/object-detection/playWithColor/cropImages/white_octogon_black_2_green_pentagon_yellow_O_3210-1090_Green.jpg')
 # filePath = '/Users/mightymanh/Desktop/HSVrange.png'
 # read img and scale it to big enough size
 img = cv2.imread(filePath)
-# img = cv2.resize(img, (500, 500))
+img = cv2.resize(img, (500, 500))
 cv2.imshow('image', img)
 
 # setting mouse handler for the image

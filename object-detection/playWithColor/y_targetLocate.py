@@ -4,18 +4,18 @@
 import os
 import cv2
 import y_targetLocateHelper as targetLoc
-import tool_testingHelper
 import tool_imgPreprocessing as prepr
 
 # init hypervariables
 stdTargetMinSize = 40
 stdTargetMaxSize = 120
-stdMinAreaRatio = 1/3
+stdMinRatioBtwAreaContourAndAreaRect = 1/3
+stdMinRatioBtwNumPixelInsideContourAndAreaContour = 0.5
 stdImgTargetRatio = 10 / 6 # the ratio the size of crop target image and the size of target
 
 # input images and folder
-folderPath = '/Users/mightymanh/Desktop/myCode/myPy/team-air-suas-2023-fix-target/simulate-images/snapshots/target'
-imgName_list = ['img_014_tar_253.jpg']
+folderPath = '/Users/mightymanh/Desktop/real images/march15'
+imgName_list = ['Frame-15-03-2023-07-34-06.jpeg']
 destFolderForCrop = 'cropImages'
 
 # for each image get centerCoords, Area of target, Shape color, width * height of target
@@ -29,8 +29,7 @@ for imgName in imgName_list:
     # cv2.waitKey(0)                                   # TESTING
 
     # target locating
-    maskFolder = 'maskFolder' # check maskFolder to understand
-    TargetFound_list = targetLoc.targetLocation(imgPreprocessed, maskFolder, stdTargetMinSize, stdTargetMaxSize, stdMinAreaRatio)
+    TargetFound_list = targetLoc.targetLocation(imgPreprocessed, stdTargetMinSize, stdTargetMaxSize, stdMinRatioBtwAreaContourAndAreaRect, stdMinRatioBtwNumPixelInsideContourAndAreaContour)
     for targetFound in TargetFound_list:
         print(targetFound)
         # color, centerCoords, targetSize

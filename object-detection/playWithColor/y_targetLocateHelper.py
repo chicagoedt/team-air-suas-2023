@@ -9,6 +9,7 @@ import tool_colorFunc as colorFunc              # color
 import tool_adaptToRealLife as adapt            # real image: light level
 import tool_imgPreprocessing as prepr           # preprocessing img
 import tool_nameFormatHelper as nameHelper        # deal with file name
+import y_findShapeInMask as findTar
 
 # preprocessing img before locating targets
 def imgPreprocessing(img):
@@ -45,76 +46,23 @@ def writeMaskToMaskFolder(maskList, destFolder):
     print('>> Finish writing mask:', imgName_list)
     return imgName_list
 
-# detect shapes that is valid (valid size and valid area)
-def findShape(img, imgName, targetMinSize, targetMaxSize, minAreaRatio):
-
-    # gray scale img
-    imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # get list of contours
-    contours, _ = cv2.findContours(imgGray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    # process each contour and grab contour whose size in range targetMinSize and targetMaxSize
-    possibleTarget_list = []
-    for contour in contours:
-
-        # min bounding box of Target
-        rect = cv2.minAreaRect(contour)
-        width, height = rect[1]
-        width = int(width)
-        height = int(height)
-
-        # filter contours with valid size
-        if targetMinSize <= width and width <= targetMaxSize and targetMinSize <= height and height <= targetMaxSize:
-            M = cv2.moments(contour)
-
-            # skip if the area is not valid
-            area = M['m00']
-            if area < ((width * height) * minAreaRatio):
-                continue
-
-            # gen centroid of contour
-            cx = int(M['m10']/M['m00']) 
-            cy = int(M['m01']/M['m00'])
-            centroid = (cx, cy)
-
-            # get average size of target
-            _, _, width1, height1 = cv2.boundingRect(contour) # width1, height1 is different to width, height
-            averageSize = int((width1 + height1) / 2)
-            
-            # add to the list
-            print('Info about contour: width: {}, height: {}, area: {}, centroid: {}, average size: {}'.format(width, height, area, centroid, averageSize))
-            possibleTarget_list.append([imgName, centroid, averageSize])
-
-    #         # draw the yellow box around the target
-    #         box = cv2.boxPoints(rect)                                             # for TESTING
-    #         box = np.intp(box)              # not sure if this line is necessary  # for TESTING
-    #         img = cv2.drawContours(img, [box], 0, (0,255,255), 2)                 # for TESTING
-    # cv2.imshow(imgName, img)                                                      # for TESTING
-    # cv2.waitKey(0)                                                                # for TESTING
-
-    return possibleTarget_list
-
-
-# main function that locates targets and also determine its shape color
-def targetLocation(img, maskFolder, stdTargetMinSize, stdTargetMaxSize, stdAreaRatio):
+# main function that locates targets and also determine its shape color, continue after collecting mask
+def targetLocation(img, stdTargetMinSize, stdTargetMaxSize, stdMinRatioBtwAreaContourAndAreaRect, stdMinRatioBtwNumPixelInsideContourAndAreaContour):
 
     # collect mask
     mask_list = collectingMasks(img)
 
-    # write masks to a folder
-    imgName_list = writeMaskToMaskFolder(mask_list, maskFolder)
-
     # target localization
     TargetFound_list = []
     print('>> Begin targetLocation:')
-    for imgName in imgName_list:
-        print(imgName)
-        color = nameHelper.cutExtension(imgName)
-        imgPath = os.path.join(maskFolder, imgName)
-        img = cv2.imread(imgPath)
+    for mask in mask_list:
+        # init imgMask
+        color = mask[0]
+        imgMask = mask[1]
+        print(color)
+
         # detect possible targets
-        TargetFound_list.extend(findShape(img, color, stdTargetMinSize, stdTargetMaxSize, stdAreaRatio))
+        TargetFound_list.extend(findTar.findShapeInMask(imgMask, color, stdTargetMinSize, stdTargetMaxSize, stdMinRatioBtwAreaContourAndAreaRect, stdMinRatioBtwNumPixelInsideContourAndAreaContour))
         print('------------------------------------------------')
     
     print('>> Finish targetLocation!')
