@@ -1,27 +1,21 @@
-
 import RPi.GPIO as GPIO
-import time
+from time import sleep
 
-output_pin = 33
-
-def rotate(degrees):
-    # Pin Setup:
-    # Board pin-numbering scheme
-    GPIO.setmode(GPIO.BOARD)
-    # set pin as an output pin with optional initial state of HIGH
-    GPIO.setup(output_pin, GPIO.OUT, initial=GPIO.HIGH)
-    print("PWM running. Press CTRL+C to exit.")
-    p = GPIO.PWM(output_pin, 50)
-    left = 5
-    neutral = 7.5
-    right = 10
-    p.ChangeDutyCycle(left) #1ms
-    time.sleep(.5)
-    p.ChangeDutyCycle(right) #2ms
-    time.sleep(.5)
-    p.stop()
-    GPIO.cleanup()
-    return
+def SetAngle(angle):
+	duty = angle / 18 + 2
+	GPIO.output(03, True)
+	pwm.ChangeDutyCycle(duty)
+	sleep(1)
+	GPIO.output(03, False)
+	pwm.ChangeDutyCycle(0)
 
 
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(18, GPIO.OUT)
+pwm=GPIO.PWM(18, 50)
+pwm.start(0)
+SetAngle(90)
+pwm.stop()
+GPIO.cleanup()
 
