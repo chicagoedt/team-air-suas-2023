@@ -1,21 +1,43 @@
+#!/usr/bin/python3
 import RPi.GPIO as GPIO
-from time import sleep
+import pigpio
+import time
 
-def SetAngle(angle):
-	duty = angle / 18 + 2
-	GPIO.output(03, True)
-	pwm.ChangeDutyCycle(duty)
-	sleep(1)
-	GPIO.output(03, False)
-	pwm.ChangeDutyCycle(0)
+servo = 18
+
+def unbrake():
+    pwm.set_servo_pulsewidth(servo, 500);
+    return
+
+def brake():
+    pwm.set_servo_pulsewidth(servo, 1000);
+    return
+
+def clear():
+    pwm.set_PWM_dutycycle(servo, 0)
+    pwm.set_PWM_frequency(servo, 0)
+    return
+
+# more info at http://abyz.me.uk/rpi/pigpio/python.html#set_servo_pulsewidth
+
+pwm = pigpio.pi()
+pwm.set_mode(servo, pigpio.OUTPUT)
+
+clear()
+
+pwm.set_PWM_frequency( servo, 50 )
+
+time.sleep(1)
+
+brake()
+
+time.sleep(3)
+
+unbrake()
+
+time.sleep(4)
+
+clear()
 
 
-
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(18, GPIO.OUT)
-pwm=GPIO.PWM(18, 50)
-pwm.start(0)
-SetAngle(90)
-pwm.stop()
-GPIO.cleanup()
-
+# turning off servo
